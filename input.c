@@ -12,12 +12,14 @@
 #include "graphics.h"
 #include "globals.h"
 #include "xintc_l.h"        // Provides handy macros for the interrupt controller.
+#include "gameLogic.h"
 
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
 #define CHAR_OFFSET 48
 #define SECOND_TIMER_MAX 100
 #define TENTH_SECOND 10
+#define QUARTER_SECOND 25
 #define HALF_SECOND 50
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
@@ -80,10 +82,10 @@ void timer_interrupt_handler()
 
 	//Poll the buttons
     if(secondTimer)
-	handleButton();
+	handleButton(currentButtonState);
 
     //Advance the aliens and fire bullets
-    if(secondTimer == HALF_SECOND)
+    if(secondTimer == QUARTER_SECOND)
     {
        alienMarch();
         if(rand() % 3 == 0)
@@ -93,7 +95,10 @@ void timer_interrupt_handler()
     }
     
     //Advance the bullets
-    bulletMove();
+    if(secondTimer % 2 == 0)
+    {
+        bulletMove();
+    }
     
     //Tic the clock one second
 	if(secondTimer == SECOND_TIMER_MAX)
@@ -105,23 +110,5 @@ void timer_interrupt_handler()
 }
 
 
-	//Returns the number of the current button that is being pressed
-void handleButton()
-{
-	currentButtonState = XGpio_DiscreteRead(&gpPB, 1);  // Get the current state of the buttons.
 
-	if(currentButtonState == 8)
-	{
-		tankMove(0);
-	}
-	else if(currentButtonState == 2)
-	{
-		tankMove(1);
-	}
-    else if(currentButtonState == 1)
-    {
-        fireBullet();
-    }
-    
-}
 
