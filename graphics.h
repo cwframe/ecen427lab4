@@ -39,4 +39,6 @@ void paintWords();
 
 void paintTankLives();
 
+void paintEarthLine();
+
 #endif /* GRAPHICS_H_ */

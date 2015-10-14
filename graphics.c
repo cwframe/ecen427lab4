@@ -73,6 +73,7 @@ void graphics_init(unsigned int * framePointer0)
 	}
 	srand(BEGINNING_SRAND);
 	paintAliens();
+	paintEarthLine();
 }
 
 void paintWords()
@@ -430,21 +431,24 @@ void bulletMove()
 	//moves tankbullet
 	int row, col;
 	point_t bulletpos = getTankBulletPosition();
-	if(bulletpos.y - TANK_BULLET_SPEED < 0)
+	if(bulletpos.y - TANK_BULLET_SPEED < EFFECTIVE_SCREEN_TOP)
 	{
 		removeTankBullet();
 	}
-	bulletpos.y -= TANK_BULLET_SPEED;
-	setTankBulletPosition(bulletpos);
-	for(row = 0; row < TANK_BULLET_HEIGHT; row++)
+	if(getNumTankBullet() > 0)
 	{
-		for(col = 0; col < TANK_BULLET_WIDTH; col++)
+		bulletpos.y -= TANK_BULLET_SPEED;
+		setTankBulletPosition(bulletpos);
+		for(row = 0; row < TANK_BULLET_HEIGHT; row++)
 		{
-			framePointer[(getTankBulletPosition().y + row) * SCREEN_WIDTH 
-				+ getTankBulletPosition().x + col] = (WHITE) * 
-					((tankBullet_graphic[row] >> (TANK_BULLET_WIDTH-1-col)) & MASK_ONE);
-			framePointer[(getTankBulletPosition().y + row + TANK_BULLET_HEIGHT) * SCREEN_WIDTH + 
-				getTankBulletPosition().x + col] = BLACK;
+			for(col = 0; col < TANK_BULLET_WIDTH; col++)
+			{
+				framePointer[(getTankBulletPosition().y + row) * SCREEN_WIDTH
+					+ getTankBulletPosition().x + col] = (WHITE) *
+						((tankBullet_graphic[row] >> (TANK_BULLET_WIDTH-1-col)) & MASK_ONE);
+				framePointer[(getTankBulletPosition().y + row + TANK_BULLET_HEIGHT) * SCREEN_WIDTH +
+					getTankBulletPosition().x + col] = BLACK;
+			}
 		}
 	}
 	//moves alien bullet
@@ -472,7 +476,7 @@ void bulletMove()
 
 				}
 			}
-			if(alienbulletpos.y > SCREEN_HEIGHT)
+			if(alienbulletpos.y > GREEN_EARTH_LINE_Y - ALIEN_BULLET_HEIGHT * 2)
 			{
 				currentalienbullets--;
 				alienBullet[alienbullet] = 0;
@@ -527,7 +531,17 @@ void bunkerHit(int bunkerId, int hitLocation)
 }
 
 
-
+void paintEarthLine()
+{
+	int row, col;
+	for(row = 0; row < GREEN_EARTH_LINE_HEIGHT; row++)
+	{
+		for(col = 0; col < SCREEN_WIDTH; col++)
+		{
+			framePointer[(row + GREEN_EARTH_LINE_Y)*SCREEN_WIDTH + col] = GREEN;
+		}
+	}
+}
 
 
 
