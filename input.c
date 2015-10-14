@@ -21,6 +21,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define HALF_SECOND 50
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
+int gameRunTime = 0;
 int secondTimer = 0;
 
 
@@ -81,15 +82,25 @@ void timer_interrupt_handler()
     if(secondTimer)
 	handleButton();
 
+    //Advance the aliens and fire bullets
     if(secondTimer == HALF_SECOND)
     {
        alienMarch();
+        if(rand() % 3 == 0)
+        {
+            fireAlienBullet();
+        }
     }
     
+    //Advance the bullets
+    bulletMove();
+    
+    //Tic the clock one second
 	if(secondTimer == SECOND_TIMER_MAX)
 	{
 		xil_printf("1 Second\n");
 		secondTimer = 0;
+        gameRunTime++;
 	}
 }
 
