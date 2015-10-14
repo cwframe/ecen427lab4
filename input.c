@@ -16,27 +16,21 @@
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
 #define CHAR_OFFSET 48
-#define SECOND_TIMER_MAX 50
+#define SECOND_TIMER_MAX 100
+#define TENTH_SECOND 10
+#define HALF_SECOND 50
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
-int onesecondtimer = 0;
+int secondTimer = 0;
 
 
 
-void input(int c)
-{
-	int first,second;
-	switch (c)
-	{
-		case 8:
-			tankMove(0);
-			break;
-		case 2:
-			tankMove(1);
-			break;
-		case 1:
-			alienMarch();
-			break;
+//void input(int c)
+//{
+//	int first,second;
+//	switch (c)
+//	{
+//
 //		case '2':
 //			first = getchar();
 //			second = getchar();
@@ -56,19 +50,20 @@ void input(int c)
 //		case '7':
 //			bunkerHit(getchar()-48, (rand() % BUNKER_WIDTH));
 //			break;
-		default:
-			break;
-	}
-}
+//		default:
+//			break;
+//	}
+//}
 
 // Main interrupt handler, queries the interrupt controller to see what peripheral
 // fired the interrupt and then dispatches the corresponding interrupt handler.
 // This routine acks the interrupt at the controller level but the peripheral
 // interrupt must be ack'd by the dispatched interrupt handler.
-void interrupt_handler_dispatcher(void* ptr) {
+void interrupt_handler_dispatcher(void* ptr)
+{
 	int intc_status = XIntc_GetIntrStatus(XPAR_INTC_0_BASEADDR);
+    
 	// Check the FIT interrupt first.
-
 	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK){
 		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_FIT_TIMER_0_INTERRUPT_MASK);
 		timer_interrupt_handler();
@@ -77,20 +72,24 @@ void interrupt_handler_dispatcher(void* ptr) {
 }
 
 
-// This is invoked in response to a timer interrupt.
-// It does 2 things: 1) debounce switches, and 2) advances the time.
+//Timer interrupt for the game.
 void timer_interrupt_handler()
 {
-	onesecondtimer++;
+	secondTimer++;
 
 	//Poll the buttons
+    if(secondTimer)
 	handleButton();
 
-	if(onesecondtimer == SECOND_TIMER_MAX && !currentButtonState)
+    if(secondTimer == HALF_SECOND)
+    {
+       alienMarch();
+    }
+    
+	if(secondTimer == SECOND_TIMER_MAX)
 	{
 		xil_printf("1 Second\n");
-		alienMarch();
-		onesecondtimer = 0;
+		secondTimer = 0;
 	}
 }
 
@@ -108,5 +107,10 @@ void handleButton()
 	{
 		tankMove(1);
 	}
+    else if(currentButtonState == 1)
+    {
+        fireBullet();
+    }
+    
 }
 
