@@ -12,5 +12,6 @@ void handleButton(int currentButtonState);
 void bulletHitDetection();
 int  alienHitDetection(point_t position);
 point_t alienPosition(int alienNumber);
+point_t bunkerHitDetection(point_t position);
 
 #endif /* GRAPHICS_H_ */

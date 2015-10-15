@@ -96,60 +96,71 @@ int alienHitDetection(point_t position)
 
 
 
-//This function is passed a bullet position and returns an integer that corresponds to the bunker that got hit and the x coordinate on the bunker that was hit.  Use / 4 and % 4 on the return value to get the bunker ID and x coordinate
-int bunkerHitDetection(point_t position)
+
+//This function uses the point_t in a different way, the x value is the Bunker ID that was hit and the y value is the X segment of the bunker that was hit
+point_t bunkerHitDetection(point_t position)
 {
-    int bunkerHitValue = -1;
-    int bunkerID = 0;
+    point_t bunkerHit;
+    
+    int bullet_relative_pos = 0;
     
     if(position.y > BUNKER_Y_VALUE && position.y < (BUNKER_Y_VALUE + BUNKER_HEIGHT))
     {
         
         if(position.x > BUNKER_1_XPOSITION && position.x < BUNKER_1_XPOSITION + BUNKER_WIDTH)
         {
-            bunkerID = 0;
+            bunkerHit.x = 0;
         }
         else if(position.x > BUNKER_2_XPOSITION && position.x < BUNKER_2_XPOSITION + BUNKER_WIDTH)
         {
-            bunkerID = 1;
+            bunkerHit.x = 1;
         }
         else if(position.x > BUNKER_3_XPOSITION && position.x < BUNKER_3_XPOSITION + BUNKER_WIDTH)
         {
-            bunkerID = 2;
+            bunkerHit.x = 2;
         }
         else if(position.x > BUNKER_4_XPOSITION && position.x < BUNKER_4_XPOSITION + BUNKER_WIDTH)
         {
-            bunkerID = 3;
+            bunkerHit.x = 3;
         }
         else
         {
-            bunkerID = -1;
+            bunkerHit.x = -1;
         }
         
         //Find where on the bunker it was hit
-        if(bunkerID != -1)
+        if(bunkerHit.x != -1)
         {
-            switch (bunkerID)
+            switch (bunkerHit.x)
             {
                 case 0:
-                    
+                    bullet_relative_pos = position.x - BUNKER_1_XPOSITION;
+                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
+                    
                 case 1:
-                    
+                    bullet_relative_pos = position.x - BUNKER_2_XPOSITION;
+                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
+                    
                 case 2:
-                    
+                    bullet_relative_pos = position.x - BUNKER_3_XPOSITION;
+                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
+                    
                 case 3:
-                    
+                    bullet_relative_pos = position.x - BUNKER_4_XPOSITION;
+                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
+                    
                 default:
                     break;
             }
         }
     }
-    
-    return bunkerHitValue;
+    //Add the x segment to the point
+    bunkerHit.y = bullet_relative_pos;
+    return bunkerHit;
 }
 
 

@@ -89,8 +89,10 @@ void timer_interrupt_handler()
 	alienMarchTimer++;
 
 	//Poll the buttons
-    if(secondTimer)
-	handleButton(currentButtonState);
+    if(secondTimer % TENTH_SECOND == 0)
+    {
+        handleButton(currentButtonState);
+    }
 
     //Advance the aliens and fire bullets
     if(alienMarchTimer >= ALIEN_MARCH_SPEED)
