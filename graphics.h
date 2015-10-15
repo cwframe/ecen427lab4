@@ -59,4 +59,7 @@ void paintTankLives();
 
 void paintEarthLine();
 
+//Returns 1 if the alienID is alive or 0 if it is dead
+int getAlienAlive(int alienID);
+
 #endif /* GRAPHICS_H_ */

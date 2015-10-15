@@ -667,6 +667,12 @@ void paintEarthLine()
 	}
 }
 
+//Returns 1 if the alienID is alive or 0 if it is dead
+int getAlienAlive(int alienID)
+{
+    return alienAlive[alienID];
+}
+
 
 
 
