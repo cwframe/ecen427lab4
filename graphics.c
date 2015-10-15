@@ -27,16 +27,18 @@ void print(char *str);
 char movementdirection;
 
 unsigned int * framePointer;
+unsigned int * framePointerBackground;
 
 int alienAlive[NUM_ALIEN_COL * NUM_ALIEN_ROW];
 int alienBullet[MAX_ALIEN_BULLETS];
 int currentalienbullets;
 
-void graphics_init(unsigned int * framePointer0)
+void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
 	//start moving to the right
 	movementdirection = 1;
 	framePointer = framePointer0;
+	framePointerBackground = framePointerbg;
 	paintWords();
 	paintTankLives();
 	paintAliens();
@@ -57,6 +59,7 @@ void graphics_init(unsigned int * framePointer0)
 	}
 	srand(BEGINNING_SRAND);
 	paintAliens();
+	paintEarthLine();
 }
 
 void paintWords()
@@ -73,6 +76,13 @@ void paintWords()
 			framePointer[(row + SCORE_Y)*SCREEN_WIDTH + col + SCORE_X + ALPHA_NUM_WIDTH * 3] = (WHITE) * ((r_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 			framePointer[(row + SCORE_Y)*SCREEN_WIDTH + col + SCORE_X + ALPHA_NUM_WIDTH * 4] = (WHITE) * ((e_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 
+			//set up background frame
+			framePointerBackground[(row + SCORE_Y)*SCREEN_WIDTH + col + SCORE_X] = (WHITE) * ((s_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+			framePointerBackground[(row + SCORE_Y)*SCREEN_WIDTH + col + SCORE_X + ALPHA_NUM_WIDTH] = (WHITE) * ((c_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+			framePointerBackground[(row + SCORE_Y)*SCREEN_WIDTH + col + SCORE_X + ALPHA_NUM_WIDTH * 2] = (WHITE) * ((o_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+			framePointerBackground[(row + SCORE_Y)*SCREEN_WIDTH + col + SCORE_X + ALPHA_NUM_WIDTH * 3] = (WHITE) * ((r_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+			framePointerBackground[(row + SCORE_Y)*SCREEN_WIDTH + col + SCORE_X + ALPHA_NUM_WIDTH * 4] = (WHITE) * ((e_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+
 			//print lives
 			framePointer[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X] = (WHITE) * ((l_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 			if(col < ALPHA_I_WIDTH)
@@ -82,6 +92,16 @@ void paintWords()
 			framePointer[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH + ALPHA_I_WIDTH] = (WHITE) * ((v_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 			framePointer[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH * 2 + ALPHA_I_WIDTH] = (WHITE) * ((e_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 			framePointer[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH * 3 + ALPHA_I_WIDTH] = (WHITE) * ((s_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+
+
+			framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X] = (WHITE) * ((l_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+			if(col < ALPHA_I_WIDTH)
+			{
+				framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH] = (WHITE) * ((i_bitmap[row] >> (ALPHA_I_WIDTH-1-col)) & MASK_ONE);
+			}
+			framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH + ALPHA_I_WIDTH] = (WHITE) * ((v_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+			framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH * 2 + ALPHA_I_WIDTH] = (WHITE) * ((e_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+			framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH * 3 + ALPHA_I_WIDTH] = (WHITE) * ((s_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 		}
 	}
 }
@@ -137,7 +157,7 @@ void alienMarch()
 
 void paintAliens()
 {
-	int alien_col, row, inbetween, col, alien_row;
+	int alien_col, row, inbetween, col, alien_row, aliencolor, pos;
 	for(alien_row = 0; alien_row < NUM_ALIEN_ROW; alien_row++)
 	{
 		for (alien_col = 0; alien_col < NUM_ALIEN_COL; alien_col++)
@@ -151,63 +171,82 @@ void paintAliens()
 						switch (alien_row)
 						{
 							case 0:
+								pos = (row + getAlienLocation().y)*SCREEN_WIDTH + col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
 								if (getMovement())
-									framePointer[(row + getAlienLocation().y)*SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_top_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_top_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								else
-									framePointer[(row + getAlienLocation().y)*SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_top_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_top_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								break;
 							case 1:
+								pos = (row + getAlienLocation().y + ALIEN_HEIGHT + ROW_SPACING) *SCREEN_WIDTH +
+										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
 								if (getMovement())
-									framePointer[(row + getAlienLocation().y + ALIEN_HEIGHT + ROW_SPACING) *SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								else
-									framePointer[(row + getAlienLocation().y + ALIEN_HEIGHT + ROW_SPACING) *SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								break;
 							case 2:
+								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
+											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
 								if (getMovement())
-									framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								else
-									framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH 
-										+ col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								break;
 							case 3:
+								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH
+											+ col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
 								if (getMovement())
-									framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH 
-										+ col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								else
-									framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+
 								break;
 							case 4:
+								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
+											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
 								if (getMovement())
-									framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								else
-									framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH + 
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-											(WHITE) * ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								{
+									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 								break;
 							default:
 								break;
 						}
+						if (aliencolor)
+						{
+							framePointer[pos] = WHITE;
+						}
+						else
+						{
+							framePointer[pos] = framePointerBackground[pos];
+						}
 					}
 					else
 					{
-						framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH + 
-							col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = (BLACK);
+						pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
+								col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+						framePointer[pos] = framePointerBackground[pos];
 					}
 				}
 			}
@@ -222,13 +261,15 @@ void paintAliens()
 			{
 				if(movementdirection > 0)
 				{
-					framePointer[(getAlienLocation().y+row)*SCREEN_WIDTH + 
-						(getAlienLocation().x-col-1)] = 0x00000000; //black out part left behind
+					pos = (getAlienLocation().y+row)*SCREEN_WIDTH +
+							(getAlienLocation().x-col-1);
+					framePointer[pos] = framePointerBackground[pos]; //black out part left behind
 				}
 				else
 				{
-					framePointer[(getAlienLocation().y+row)*SCREEN_WIDTH + 
-						(getAlienLocation().x + col + 1+  (ALIEN_WIDTH * 11))] = 0x00000000; //black out part left behind
+					pos = (getAlienLocation().y+row)*SCREEN_WIDTH +
+							(getAlienLocation().x + col + 1+  (ALIEN_WIDTH * NUM_ALIEN_COL));
+					framePointer[pos]  = framePointerBackground[pos]; //black out part left behind
 				}
 			}
 		}
@@ -243,13 +284,15 @@ void paintAliens()
 				{
 					if(inbetween && row <= ROW_SPACING)
 					{
-						framePointer[((getAlienLocation().y - row) + (inbetween * ALIEN_HEIGHT) + (ROW_SPACING * inbetween))*SCREEN_WIDTH + 
-							(getAlienLocation().x) + col] = BLACK; //black out part left behind
+						pos = ((getAlienLocation().y - row) + (inbetween * ALIEN_HEIGHT) + (ROW_SPACING * inbetween))*SCREEN_WIDTH +
+								(getAlienLocation().x) + col;
+						framePointer[pos] = framePointerBackground[pos]; //black out part left behind
 					}
 					else if(!inbetween)
 					{
-						framePointer[((getAlienLocation().y - row) + (inbetween * ALIEN_HEIGHT))*SCREEN_WIDTH + 
-							(getAlienLocation().x) + col] = BLACK; //black out part left behind
+						pos = ((getAlienLocation().y - row) + (inbetween * ALIEN_HEIGHT))*SCREEN_WIDTH +
+								(getAlienLocation().x) + col;
+						framePointer[pos] = framePointerBackground[pos]; //black out part left behind
 					}
 				}
 			}
@@ -265,14 +308,19 @@ void killAlien(int alienId)
 
 		int alien_row = alienId / NUM_ALIEN_COL;
 		int alien_col = alienId % NUM_ALIEN_COL;
-		int row, col;
+		int row, col, pos, color;
 		for(row = 0; row < EXPLOSION_HEIGHT; row++)
 		{
 			for(col = 0; col < ALIEN_WIDTH; col++)
 			{
-				framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING) * alien_row) * SCREEN_WIDTH +
-					col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x] = 
-						(WHITE) * ((alien_explosion[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);;
+				pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING) * alien_row) * SCREEN_WIDTH +
+						col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+				color = ((alien_explosion[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+				if(color)
+					framePointer[pos] = WHITE;
+				else
+					framePointer[pos] = framePointerBackground[pos];
+
 			}
 		}
 	}
@@ -297,13 +345,17 @@ void tankMove(int direction)
 //draws the tank and erases any trails
 void paintTank()
 {
-	int row, col;
+	int row, col, pos, color;
 	for(row = 0; row < TANK_HEIGHT; row++)
 	{
 		for(col = 0; col < TANK_WIDTH; col++)
 		{
-			framePointer[((TANK_Y_VALUE + row) * SCREEN_WIDTH) + (getTankPositionGlobal() + col)] = 
-				(GREEN) * ((tank[row] >> (TANK_WIDTH-1-col)) & MASK_ONE);
+			pos = ((TANK_Y_VALUE + row) * SCREEN_WIDTH) + (getTankPositionGlobal() + col);
+			color = ((tank[row] >> (TANK_WIDTH-1-col)) & MASK_ONE);
+			if (color)
+				framePointer[pos] = (GREEN);
+			else
+				framePointer[pos] = framePointerBackground[pos];
 		}
 	}
 
@@ -312,8 +364,10 @@ void paintTank()
 	{
 		for(col = 0; col < TANK_MOVE_DISTANCE; col++)
 		{
-			framePointer[((TANK_Y_VALUE + row) * SCREEN_WIDTH) + (getTankPositionGlobal() + col) - TANK_MOVE_DISTANCE] = BLACK;
-			framePointer[((TANK_Y_VALUE + row) * SCREEN_WIDTH) + (getTankPositionGlobal() + TANK_WIDTH + col)] = BLACK;
+			pos = ((TANK_Y_VALUE + row) * SCREEN_WIDTH) + (getTankPositionGlobal() + col) - TANK_MOVE_DISTANCE;
+			framePointer[pos] = framePointerBackground[pos];
+			pos = ((TANK_Y_VALUE + row) * SCREEN_WIDTH) + (getTankPositionGlobal() + TANK_WIDTH + col);
+			framePointer[pos] = framePointerBackground[pos];
 		}
 	}
 }
@@ -341,9 +395,9 @@ void fireAlienBullet()
 	{
 		return;
 	}
-	int row, col;
+	int row, col, pos, color;
 	int aliennum = rand() % NUM_ALIEN_COL;
-	//int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; to be implemented to fire different bullets
+	int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; //to be implemented to fire different bullets
 	point_t bulletpos;
 	int currentbullet;
 	bulletpos.y = getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
@@ -361,19 +415,23 @@ void fireAlienBullet()
 	{
 		for(col = 0; col < ALIEN_BULLET_WIDTH; col++)
 		{
-		//	if(!bullettype) //paints the correct bullet
-			//{
+			if(!bullettype) //paints the correct bullet
+			{
 				alienBullet[currentbullet] = 1;
-				framePointer[(row + bulletpos.y)*SCREEN_WIDTH + col + bulletpos.x] =
-				            		 (WHITE) * ((alien_bullet1_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
-			/*}
+				pos = (row + bulletpos.y)*SCREEN_WIDTH + col + bulletpos.x;
+				color = ((alien_bullet1_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+
+			}
 			else
 			{
-				alienBullet[currentalienbullets] = 4;
-				framePointer[(row + getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1)))*SCREEN_WIDTH
-				             + col + getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET] =
-				            		 (WHITE)* ((alien_bullet2_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
-			}*/
+				alienBullet[currentalienbullets] = 5;
+				pos = (row + bulletpos.y)*SCREEN_WIDTH + col + bulletpos.x;
+				color = ((alien_bullet2_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+			}
+			if(color)
+				framePointer[pos] = WHITE;
+			else
+				framePointer[pos] = framePointerBackground[pos];
 
 		}
 	}
@@ -383,12 +441,13 @@ void fireAlienBullet()
 //removes the tank bullet so the user can shoot another
 void removeTankBullet()
 {
-	int row, col;
+	int row, col, pos;
 	for(row = 0; row < TANK_BULLET_HEIGHT; row++)
 	{
 		for(col = 0; col < TANK_BULLET_WIDTH; col++)
 		{
-			framePointer[(getTankBulletPosition().y + row) * SCREEN_WIDTH + getTankBulletPosition().x + col] = BLACK;
+			pos = (getTankBulletPosition().y + row) * SCREEN_WIDTH + getTankBulletPosition().x + col;
+			framePointer[pos] = framePointerBackground[pos];
 		}
 	}
 	setNumTankBullet(0);
@@ -397,13 +456,13 @@ void removeTankBullet()
 //erases the alien bullet that just moved off screen
 void eraseAlienBullet(point_t alienbulletpos)
 {
-	int row, col;
+	int row, col, pos;
 	for(row = 0; row < ALIEN_BULLET_HEIGHT; row++)
 	{
 		for(col = 0; col < ALIEN_BULLET_WIDTH; col++)
 		{
-			framePointer[(alienbulletpos.y + row) * SCREEN_WIDTH + col + alienbulletpos.x] =
-																BLACK;
+			pos = (alienbulletpos.y + row) * SCREEN_WIDTH + col + alienbulletpos.x;
+			framePointer[pos] = framePointerBackground[pos];
 		}
 	}
 }
@@ -412,23 +471,31 @@ void eraseAlienBullet(point_t alienbulletpos)
 void bulletMove()
 {
 	//moves tankbullet
-	int row, col;
+	int row, col, pos, color;
 	point_t bulletpos = getTankBulletPosition();
-	if(bulletpos.y - TANK_BULLET_SPEED < 0)
+	if(bulletpos.y - TANK_BULLET_SPEED < EFFECTIVE_SCREEN_TOP)
 	{
 		removeTankBullet();
 	}
-	bulletpos.y -= TANK_BULLET_SPEED;
-	setTankBulletPosition(bulletpos);
-	for(row = 0; row < TANK_BULLET_HEIGHT; row++)
+	if(getNumTankBullet() > 0)
 	{
-		for(col = 0; col < TANK_BULLET_WIDTH; col++)
+		bulletpos.y -= TANK_BULLET_SPEED;
+		setTankBulletPosition(bulletpos);
+		for(row = 0; row < TANK_BULLET_HEIGHT; row++)
 		{
-			framePointer[(getTankBulletPosition().y + row) * SCREEN_WIDTH 
-				+ getTankBulletPosition().x + col] = (WHITE) * 
-					((tankBullet_graphic[row] >> (TANK_BULLET_WIDTH-1-col)) & MASK_ONE);
-			framePointer[(getTankBulletPosition().y + row + TANK_BULLET_HEIGHT) * SCREEN_WIDTH + 
-				getTankBulletPosition().x + col] = BLACK;
+			for(col = 0; col < TANK_BULLET_WIDTH; col++)
+			{
+				pos = (getTankBulletPosition().y + row) * SCREEN_WIDTH
+						+ getTankBulletPosition().x + col;
+				color = ((tankBullet_graphic[row] >> (TANK_BULLET_WIDTH-1-col)) & MASK_ONE);
+				if(color)
+					framePointer[pos] = WHITE;
+				else
+					framePointer[pos] = framePointerBackground[pos];
+				pos = (getTankBulletPosition().y + row + TANK_BULLET_HEIGHT) * SCREEN_WIDTH +
+						getTankBulletPosition().x + col;
+				framePointer[pos] = framePointerBackground[pos];
+			}
 		}
 	}
 	//moves alien bullet
@@ -446,17 +513,75 @@ void bulletMove()
 			{
 				for(col = 0; col < ALIEN_BULLET_WIDTH; col++)
 				{
-					framePointer[(alienbulletpos.y + row) * SCREEN_WIDTH + col + alienbulletpos.x] =
-																		(WHITE) * ((alien_bullet1_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+					pos = (alienbulletpos.y + row) * SCREEN_WIDTH + col + alienbulletpos.x;
+					switch (alienBullet[alienbullet])
+					{
+						case 1:
+							color = ((alien_bullet1_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+
+						case 2:
+							color = ((alien_bullet1_2[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 3:
+							color = ((alien_bullet1_3[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 4:
+							color = ((alien_bullet1_2[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 5:
+							color = ((alien_bullet2_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+
+						case 6:
+							color = ((alien_bullet2_2[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 7:
+							color = ((alien_bullet2_3[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 8:
+							color = ((alien_bullet2_4[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
+							break;
+					}
+					if(color)
+						framePointer[pos] = WHITE;
+					else
+						framePointer[pos] = framePointerBackground[pos];
 					if(row <= ALIEN_BULLET_SPEED && row > 0)
 					{
-						framePointer[(alienbulletpos.y - row) * SCREEN_WIDTH + col + alienbulletpos.x] =
-												BLACK;
+						pos = (alienbulletpos.y - row) * SCREEN_WIDTH + col + alienbulletpos.x;
+						framePointer[pos] = framePointerBackground[pos];
 					}
-
 				}
 			}
-			if(alienbulletpos.y > SCREEN_HEIGHT)
+			switch(alienBullet[alienbullet])
+			{
+				case 1:
+					alienBullet[alienbullet] = 2;
+					break;
+				case 2:
+					alienBullet[alienbullet] = 3;
+					break;
+				case 3:
+					alienBullet[alienbullet] = 4;
+					break;
+				case 4:
+					alienBullet[alienbullet] = 1;
+					break;
+				case 5:
+					alienBullet[alienbullet] = 6;
+					break;
+				case 6:
+					alienBullet[alienbullet] = 7;
+					break;
+				case 7:
+					alienBullet[alienbullet] = 8;
+					break;
+				case 8:
+					alienBullet[alienbullet] = 5;
+					break;
+			}
+			if(alienbulletpos.y > GREEN_EARTH_LINE_Y - ALIEN_BULLET_HEIGHT * 2)
 			{
 				currentalienbullets--;
 				alienBullet[alienbullet] = 0;
@@ -477,8 +602,14 @@ void paintBunker(int bunkerId)
 			framePointer[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) + 
 				(col + (bunkerId * SCREEN_WIDTH/4)) + BUNKER_OFFSET] = 
 					(GREEN) * ((bunkerLeft[row] >> ((BUNKER_WIDTH/2)-1-col)) & MASK_ONE);
+
+			//background frame
+			framePointerBackground[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) +
+							(col + (bunkerId * SCREEN_WIDTH/4)) + BUNKER_OFFSET] =
+								(GREEN) * ((bunkerLeft[row] >> ((BUNKER_WIDTH/2)-1-col)) & MASK_ONE);
 		}
 	}
+
 	for(row = 0; row < BUNKER_HEIGHT; row++)
 	{
 		for(col = 0; col < (BUNKER_WIDTH/2); col++)
@@ -486,6 +617,11 @@ void paintBunker(int bunkerId)
 			framePointer[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) + 
 				(col + BUNKER_WIDTH/2) + (bunkerId * SCREEN_WIDTH/4) + BUNKER_OFFSET] = 
 					(GREEN) * ((bunkerRight[row] >> ((BUNKER_WIDTH/2)-1-col)) & MASK_ONE);
+
+			//background frame
+			framePointerBackground[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) +
+							(col + BUNKER_WIDTH/2) + (bunkerId * SCREEN_WIDTH/4) + BUNKER_OFFSET] =
+								(GREEN) * ((bunkerRight[row] >> ((BUNKER_WIDTH/2)-1-col)) & MASK_ONE);
 		}
 	}
 }
@@ -503,6 +639,11 @@ void bunkerHit(int bunkerId, int hitLocation)
 			framePointer[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) + 
 				(col + hitLocation) + (bunkerId * SCREEN_WIDTH/4) + BUNKER_OFFSET] = 
 					(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+
+			//background
+			framePointerBackground[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) +
+							(col + hitLocation) + (bunkerId * SCREEN_WIDTH/4) + BUNKER_OFFSET] =
+								(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 		}
 	}
 
@@ -511,7 +652,20 @@ void bunkerHit(int bunkerId, int hitLocation)
 }
 
 
+void paintEarthLine()
+{
+	int row, col;
+	for(row = 0; row < GREEN_EARTH_LINE_HEIGHT; row++)
+	{
+		for(col = 0; col < SCREEN_WIDTH; col++)
+		{
+			framePointer[(row + GREEN_EARTH_LINE_Y)*SCREEN_WIDTH + col] = GREEN;
 
+			//background
+			framePointerBackground[(row + GREEN_EARTH_LINE_Y)*SCREEN_WIDTH + col] = GREEN;
+		}
+	}
+}
 
 
 

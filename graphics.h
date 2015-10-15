@@ -28,7 +28,7 @@
 
 
 
-void graphics_init(unsigned int * framePointer);
+void graphics_init(unsigned int * framePointer, unsigned int * framePointerbg);
 
 void alienMarch();
 
@@ -56,5 +56,7 @@ void bunkerHit(int bunkerId, int hitLocation);
 void paintWords();
 
 void paintTankLives();
+
+void paintEarthLine();
 
 #endif /* GRAPHICS_H_ */
