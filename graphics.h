@@ -8,6 +8,24 @@
 #ifndef GRAPHICS_H_
 #define GRAPHICS_H_
 
+#define MASK_ONE 0x1
+#define ALIEN_WIDTH 32
+#define ROW_SPACING 10
+#define DEBUG
+#define ALIEN_HORIZONTAL_DISTANCE 4
+#define ALIEN_VERTICAL_DISTANCE 10
+#define NUM_ALIEN_COL 11
+#define NUM_ALIEN_ROW 5
+#define WHITE 0xFFFFFFFF
+#define GREEN 0x000FFF00
+#define BLACK 0x00000000
+#define TANK_MOVE_DISTANCE 4
+#define TANK_BULLET_SPEED 4
+#define ALIEN_BULLET_OFFSET 4
+#define NUM_ALIEN_BULLET_TYPES 2
+#define ALIEN_BULLET_SPEED 4
+#define BEGINNING_SRAND 77
+
 
 
 void graphics_init(unsigned int * framePointer);
