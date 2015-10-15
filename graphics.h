@@ -10,7 +10,7 @@
 
 
 
-void graphics_init(unsigned int * framePointer);
+void graphics_init(unsigned int * framePointer, unsigned int * framePointerbg);
 
 void alienMarch();
 

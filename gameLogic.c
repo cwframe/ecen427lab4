@@ -15,9 +15,10 @@
 #include "globals.h"
 #include "graphics.h"
 #include "gameLogic.h"
+#include "xgpio.h"
 
 
-
+XGpio gpPB;
 //Returns the number of the current button that is being pressed
 void handleButton(int currentButtonState)
 {
@@ -43,8 +44,8 @@ void handleButton(int currentButtonState)
 
 void bulletHitDetection()
 {
-    point_t alienLocation = getAlienLocation()
-    point_t tankBulletPos = get
+    point_t alienLocation = getAlienLocation();
+    //point_t tankBulletPos = get
     
     
     

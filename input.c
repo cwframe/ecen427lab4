@@ -21,6 +21,9 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define TENTH_SECOND 10
 #define QUARTER_SECOND 25
 #define HALF_SECOND 50
+#define BULLET_SPEED 3
+#define BULLET_CHANCE 3
+#define ALIEN_MARCH_SPEED QUARTER_SECOND
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
 int gameRunTime = 0;
@@ -88,14 +91,14 @@ void timer_interrupt_handler()
     if(secondTimer == QUARTER_SECOND)
     {
        alienMarch();
-        if(rand() % 3 == 0)
+        if(rand() % BULLET_CHANCE == 0)
         {
             fireAlienBullet();
         }
     }
     
     //Advance the bullets
-    if(secondTimer % 2 == 0)
+    if(secondTimer % BULLET_SPEED == 0)
     {
         bulletMove();
     }

@@ -158,7 +158,7 @@ int main()
        }
      }
      globals_init();
-     graphics_init(framePointer0);
+     graphics_init(framePointer0, framePointer1);
 
      //print one alien on frame 0
 
