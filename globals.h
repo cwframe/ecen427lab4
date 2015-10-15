@@ -2,6 +2,9 @@
 #define GLOBALS_H_
 
 #include <stdio.h>
+#define SHIP_SPEED 2
+#define SHIP_WIDTH 32
+#define SHIP_HEIGHT 14
 #define MAX_LIVES 3
 #define ALIEN_HEIGHT 16
 #define SAUCER_HEIGHT 14
@@ -31,6 +34,7 @@
 #define SCREEN_BUFFER 20
 #define SCORE_Y SCREEN_BUFFER
 #define SCORE_X SCREEN_BUFFER
+#define	SCORE_NUM_X SCORE_X + 10
 #define LIVES_Y SCREEN_BUFFER
 #define TANK_LIVES_SPACING 6
 #define LIVES_WORD_TANK_SPACING 10
@@ -40,6 +44,7 @@
 #define TANK_LIVES_X LIVES_X + LIVES_WORD_WIDTH + LIVES_WORD_TANK_SPACING
 #define TANK_LIVES_Y (LIVES_Y - (TANK_HEIGHT - ALPHA_NUM_HEIGHT))
 #define EFFECTIVE_SCREEN_TOP (SCREEN_BUFFER + ALPHA_NUM_HEIGHT)
+#define SHIP_Y (EFFECTIVE_SCREEN_TOP + 4)
 #define GREEN_EARTH_LINE_Y 460
 #define GREEN_EARTH_LINE_HEIGHT 1
 
@@ -88,6 +93,9 @@ typedef struct {unsigned short x; unsigned short y;} point_t;
 
 void globals_init();
 
+int getShipAlive();
+void setShipAlive(int alive);
+
 int getLives();
 void setLives(int newlives);
 
@@ -96,6 +104,9 @@ unsigned short getTankPositionGlobal();
 
 void setTankBulletPosition(point_t val);
 point_t getTankBulletPosition();
+
+void setShipPos(unsigned short val);
+unsigned int getShipPos();
 
 void setMovement(int movement);
 int getMovement();

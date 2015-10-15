@@ -132,30 +132,14 @@ int main()
      // Just paint some large red, green, blue, and white squares in different
      // positions of the image for each frame in the buffer (framePointer0 and framePointer1).
      int row=0, col=0;
-     for( row=0; row<480; row++) {
-    	 for(col=0; col<640; col++) {
-    	 if(row < 240) {
-    		 if(col<320) {
+     for( row=0; row<480; row++)
+     {
+    	 for(col=0; col<640; col++)
+    	 {
     			 // upper left corner.
-    			 framePointer0[row*640 + col] = 0x00000000;  // frame 0 is red here.
-    			 framePointer1[row*640 + col] = 0x00000000;  // frame 1 is green here.
-    		 } else {
-    			 // upper right corner.
-    			 framePointer0[row*640 + col] = 0x00000000;  // frame 0 is blue here.
-    			 framePointer1[row*640 + col] = 0x00000000;  // frame 1 is red here.
-    		 }
-    	 } else {
-    		 if(col<320) {
-    			 // lower left corner.
-    			 framePointer0[row*640 + col] = 0x00000000;  // frame 0 is green here.
-    			 framePointer1[row*640 + col] = 0x00000000;  // frame 1 is white here.
-    		 } else {
-    			 // lower right corner.
-    			 framePointer0[row*640 + col] = 0x00000000;  // frame 0 is white here.
-    			 framePointer1[row*640 + col] = 0x00000000;  // frame 1 is blue here.
-    		 }
+    			 framePointer0[row*640 + col] = 0x00000000;  // black
+    			 framePointer1[row*640 + col] = 0x00000000;
     	 }
-       }
      }
      globals_init();
      graphics_init(framePointer0, framePointer1);
