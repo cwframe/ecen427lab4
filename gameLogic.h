@@ -13,5 +13,6 @@ void bulletHitDetection();
 int  alienHitDetection(point_t position);
 point_t alienPosition(int alienNumber);
 point_t bunkerHitDetection(point_t position);
+int tankHitDetection(point_t bulletPosition);
 
 #endif /* GRAPHICS_H_ */

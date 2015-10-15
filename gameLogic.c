@@ -126,6 +126,7 @@ point_t bunkerHitDetection(point_t position)
         else
         {
             bunkerHit.x = -1;
+            bunkerHit.y = -1;
         }
         
         //Find where on the bunker it was hit
@@ -171,8 +172,8 @@ point_t bunkerHitDetection(point_t position)
 point_t alienPosition(int alienNumber)
 {
     point_t alienCoordinates;
-    alienCoordinates.x = 0;
-    alienCoordinates.y = 0;
+    alienCoordinates.x = -1;
+    alienCoordinates.y = -1;
     
     //Make sure the alienNumber is valid
     if(alienNumber < (NUM_ALIEN_ROW * NUM_ALIEN_COL) && alienNumber >= 0)
@@ -190,6 +191,22 @@ point_t alienPosition(int alienNumber)
 }
 
 
+int tankHitDetection(point_t bulletPosition)
+{
+    unsigned short tankPosition = 0;
+    //unsigned short getTankPositionGlobal();
+    
+    if(bulletPosition.y >= TANK_Y_VALUE && bulletPosition.y < (TANK_Y_VALUE + TANK_HEIGHT))
+    {
+        if(bulletPosition.x >= tankPosition && bulletPosition.x < tankPosition + TANK_WIDTH)
+        {
+            return 1;
+        }
+    }
+    return -1;
+}
+
+
 
 
 //This function is passed a bullet position,
@@ -197,10 +214,6 @@ void bulletHitDetection()
 {
     point_t alienLocation = getAlienLocation();
     point_t tankBulletPos = getTankBulletPosition();
-
-    
-    
-    
 }
 
 

@@ -25,6 +25,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define BULLET_CHANCE 3
 #define SHIP_MOVE_MAX_TIMER 5
 #define ALIEN_MARCH_SPEED HALF_SECOND
+#define TANK_SPEED 2
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
 int gameRunTime = 0;
@@ -89,7 +90,7 @@ void timer_interrupt_handler()
 	alienMarchTimer++;
 
 	//Poll the buttons
-    if(secondTimer % TENTH_SECOND == 0)
+    if(secondTimer % TANK_SPEED == 0)
     {
         handleButton(currentButtonState);
     }
