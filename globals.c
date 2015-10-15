@@ -20,7 +20,8 @@ char bunker2Damage;
 char bunker3Damage;
 int score;
 int lives;
-
+unsigned int shippos;
+int shipAlive;
 
 void globals_init()
 {
@@ -37,6 +38,18 @@ void globals_init()
 	bunker3Damage = 0;
 	score = 0;
 	lives = MAX_LIVES;
+	shipAlive = 0;
+}
+
+
+int getShipAlive()
+{
+	return shipAlive;
+}
+
+void setShipAlive(int alive)
+{
+	shipAlive = alive;
 }
 
 int getLives()
@@ -56,6 +69,15 @@ void setScore(int newscore)
 int getScore()
 {
 	return score;
+}
+
+void setShipPos(unsigned short val)
+{
+	shippos = val;
+}
+unsigned int getShipPos()
+{
+	return shippos;
 }
 
 char getBunkerDamage(int bunkerId)

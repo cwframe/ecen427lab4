@@ -23,11 +23,15 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define HALF_SECOND 50
 #define BULLET_SPEED 3
 #define BULLET_CHANCE 3
-#define ALIEN_MARCH_SPEED QUARTER_SECOND
+#define SHIP_MOVE_MAX_TIMER 5
+#define ALIEN_MARCH_SPEED HALF_SECOND
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
 int gameRunTime = 0;
 int secondTimer = 0;
+int alienMarchTimer = 0;
+int shipMoveTimer = 0;
+
 
 
 
@@ -82,19 +86,21 @@ void interrupt_handler_dispatcher(void* ptr)
 void timer_interrupt_handler()
 {
 	secondTimer++;
+	alienMarchTimer++;
 
 	//Poll the buttons
     if(secondTimer)
 	handleButton(currentButtonState);
 
     //Advance the aliens and fire bullets
-    if(secondTimer == QUARTER_SECOND)
+    if(alienMarchTimer >= ALIEN_MARCH_SPEED)
     {
        alienMarch();
         if(rand() % BULLET_CHANCE == 0)
         {
             fireAlienBullet();
         }
+        alienMarchTimer = 0;
     }
     
     //Advance the bullets
@@ -110,6 +116,26 @@ void timer_interrupt_handler()
 		secondTimer = 0;
         gameRunTime++;
 	}
+
+	if(getShipAlive())
+	{
+		shipMoveTimer++;
+		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
+		{
+			shipMoveTimer = 0;
+			marchShip();
+		}
+	}
+
+	/*if(gameRunTime % (30 + rand()%15))
+	{
+		if(!getShipAlive())
+		{
+			setShipAlive(1);
+		}
+	}*/
+
+
 }
 
 

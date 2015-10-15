@@ -32,11 +32,13 @@ unsigned int * framePointerBackground;
 int alienAlive[NUM_ALIEN_COL * NUM_ALIEN_ROW];
 int alienBullet[MAX_ALIEN_BULLETS];
 int currentalienbullets;
+int shipdirection;
 
 void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
 	//start moving to the right
 	movementdirection = 1;
+	shipdirection = 1;
 	framePointer = framePointer0;
 	framePointerBackground = framePointerbg;
 	paintWords();
@@ -60,7 +62,75 @@ void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 	srand(BEGINNING_SRAND);
 	paintAliens();
 	paintEarthLine();
+	paintScore();
 }
+
+
+void paintShip()
+{
+	int row, col, color, pos;
+	for(row = 0; row < SHIP_HEIGHT; row++)
+	{
+		for(col = 0; col < SHIP_WIDTH; col++)
+		{
+			pos = (row + SHIP_Y) * SCREEN_WIDTH + col + getShipPos();
+			color = ((saucer[row] >> (SHIP_WIDTH-1-col)) & MASK_ONE);
+			if(color)
+				framePointer[pos] = RED;
+			else
+				framePointer[pos] = framePointerBackground[pos];
+		}
+	}
+	//clear behind
+	for(row = 0; row < SHIP_HEIGHT; row++)
+	{
+		for(col = 0; col < SHIP_SPEED; col++)
+		{
+			if(shipdirection)
+				pos = (row + SHIP_Y) * SCREEN_WIDTH - col + getShipPos();
+			else
+				pos = (row + SHIP_Y) * SCREEN_WIDTH + col + getShipPos() + SHIP_WIDTH;
+			framePointer[pos] = framePointerBackground[pos];
+		}
+	}
+}
+
+void removeShip()
+{
+	int row, col, pos;
+	for(row = 0; row < SHIP_HEIGHT; row++)
+	{
+		for(col = 0; col < SHIP_WIDTH; col++)
+		{
+			pos = (row + SHIP_Y) * SCREEN_WIDTH + col + getShipPos();
+			framePointer[pos] = framePointerBackground[pos];
+		}
+	}
+	setShipAlive(0);
+	shipdirection = !shipdirection;
+}
+
+void marchShip()
+{
+	if(shipdirection)
+	{
+		setShipPos(getShipPos()+SHIP_SPEED);
+	}
+	else
+	{
+		setShipPos(getShipPos()-SHIP_SPEED);
+	}
+	if(getShipPos() < 0 || getShipPos() + SHIP_WIDTH > SCREEN_WIDTH)
+	{
+		removeShip();
+	}
+	else
+	{
+		paintShip();
+	}
+}
+
+
 
 void paintWords()
 {
@@ -102,6 +172,21 @@ void paintWords()
 			framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH + ALPHA_I_WIDTH] = (WHITE) * ((v_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 			framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH * 2 + ALPHA_I_WIDTH] = (WHITE) * ((e_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
 			framePointerBackground[(row + LIVES_Y)*SCREEN_WIDTH + col + LIVES_X + ALPHA_NUM_WIDTH * 3 + ALPHA_I_WIDTH] = (WHITE) * ((s_bitmap[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+		}
+	}
+}
+
+
+void paintScore()
+{
+	int row, col, pos, color;
+	int score = getScore();
+	int offset = SCORE_NUM_X;
+	for(row = 0; row < ALPHA_NUM_HEIGHT; row++)
+	{
+		for(col = 0; col < ALPHA_NUM_WIDTH; col++)
+		{
+
 		}
 	}
 }
@@ -235,11 +320,13 @@ void paintAliens()
 						}
 						if (aliencolor)
 						{
-							framePointer[pos] = WHITE;
+							if(framePointer[pos] != WHITE)
+								framePointer[pos] = WHITE;
 						}
 						else
 						{
-							framePointer[pos] = framePointerBackground[pos];
+							if(framePointer[pos] != framePointerBackground[pos])
+								framePointer[pos] = framePointerBackground[pos];
 						}
 					}
 					else
@@ -397,7 +484,8 @@ void fireAlienBullet()
 	}
 	int row, col, pos, color;
 	int aliennum = rand() % NUM_ALIEN_COL;
-	int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; //to be implemented to fire different bullets
+	//int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; //to be implemented to fire different bullets
+	int bullettype = 0;
 	point_t bulletpos;
 	int currentbullet;
 	bulletpos.y = getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
@@ -532,7 +620,6 @@ void bulletMove()
 						case 5:
 							color = ((alien_bullet2_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
 							break;
-
 						case 6:
 							color = ((alien_bullet2_2[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
 							break;
@@ -581,7 +668,7 @@ void bulletMove()
 					alienBullet[alienbullet] = 5;
 					break;
 			}
-			if(alienbulletpos.y > GREEN_EARTH_LINE_Y - ALIEN_BULLET_HEIGHT * 2)
+			if(alienbulletpos.y > GREEN_EARTH_LINE_Y - ALIEN_BULLET_HEIGHT)
 			{
 				currentalienbullets--;
 				alienBullet[alienbullet] = 0;

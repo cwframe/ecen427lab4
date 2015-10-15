@@ -11,7 +11,7 @@
 #define MASK_ONE 0x1
 #define ALIEN_WIDTH 32
 #define ROW_SPACING 10
-#define DEBUG
+#define DEBUG 0
 #define ALIEN_HORIZONTAL_DISTANCE 4
 #define ALIEN_VERTICAL_DISTANCE 10
 #define NUM_ALIEN_COL 11
@@ -19,6 +19,7 @@
 #define WHITE 0xFFFFFFFF
 #define GREEN 0x000FFF00
 #define BLACK 0x00000000
+#define RED 0xFFF00000
 #define TANK_MOVE_DISTANCE 4
 #define TANK_BULLET_SPEED 4
 #define ALIEN_BULLET_OFFSET 4
@@ -61,5 +62,14 @@ void paintEarthLine();
 
 //Returns 1 if the alienID is alive or 0 if it is dead
 int getAlienAlive(int alienID);
+
+void paintScore();
+
+void paintShip();
+
+void marchShip();
+
+void removeShip();
+
 
 #endif /* GRAPHICS_H_ */
