@@ -2,6 +2,9 @@
 #define GLOBALS_H_
 
 #include <stdio.h>
+#define TOP_ALIEN_SCORE 40
+#define MIDDLE_ALIEN_SCORE 20
+#define BOTTOM_ALIEN_SCORE 10
 #define SHIP_SPEED 2
 #define SHIP_WIDTH 32
 #define SHIP_HEIGHT 14
@@ -727,7 +730,7 @@ static const int num_bitmap_2[] =
 };
 
 
-static const int nmu_bitmap_3[] =
+static const int num_bitmap_3[] =
 {
 	packWord12(1,1,1,1,1,1,1,1,0,0,0,0),
 	packWord12(1,1,1,1,1,1,1,1,0,0,0,0),

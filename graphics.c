@@ -176,6 +176,26 @@ void paintWords()
 }
 
 
+int getThousands()
+{
+	return getScore() / 1000;
+}
+
+int getHundreds()
+{
+	return (getScore() - getThousands() * 1000) / 100;
+}
+
+int getTens()
+{
+	return (getScore() - (getThousands() * 1000) + getHundreds() * 100)/10;
+}
+
+int getOnes()
+{
+	return (getScore() - (getThousands() * 1000) + getHundreds() * 100 + getTens()*10);
+}
+
 void paintScore()
 {
 	int row, col, pos, color;
@@ -185,7 +205,44 @@ void paintScore()
 	{
 		for(col = 0; col < ALPHA_NUM_WIDTH; col++)
 		{
-
+			int num;//getChar
+			pos = (row + SCORE_Y) * SCREEN_WIDTH + col + offset;
+			switch(num)
+			{
+				case 0:
+					color = ((num_bitmap_0[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 1:
+					if(col < NUM_1_WIDTH)
+						color = ((num_bitmap_1[row] >> (NUM_1_WIDTH-1-col)) & MASK_ONE);
+					else
+						color = 0;
+					break;
+				case 2:
+					color = ((num_bitmap_2[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 3:
+					color = ((num_bitmap_3[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 4:
+					color = ((num_bitmap_4[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 5:
+					color = ((num_bitmap_5[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 6:
+					color = ((num_bitmap_6[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 7:
+					color = ((num_bitmap_7[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 8:
+					color = ((num_bitmap_8[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+				case 9:
+					color = ((num_bitmap_9[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+					break;
+			}
 		}
 	}
 }
@@ -648,6 +705,21 @@ void bulletMove()
 		{
 			killAlien(alienhit);
 			removeTankBullet();
+			if(alienhit < NUM_ALIEN_COL)
+				setScore(getScore()+TOP_ALIEN_SCORE);
+			else if (alienhit < NUM_ALIEN_COL * 3)
+				setScore(getScore()+MIDDLE_ALIEN_SCORE);
+			else
+				setScore(getScore() + BOTTOM_ALIEN_SCORE);
+		}
+		else if(bulletpos.y > BUNKER_Y_VALUE && bulletpos.y < BUNKER_Y_VALUE + BUNKER_HEIGHT)
+		{
+			point_t temp = bunkerHitDetection(bulletpos);
+			if(temp.x >= 0)
+			{
+				bunkerHit(temp.x, temp.y);
+				removeTankBullet();
+			}
 		}
 	}
 
@@ -672,7 +744,6 @@ void bulletMove()
 						case 1:
 							color = ((alien_bullet1_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
 							break;
-
 						case 2:
 							color = ((alien_bullet1_2[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
 							break;
@@ -744,7 +815,7 @@ void bulletMove()
 				point_t temp = bunkerHitDetection(alienbulletpos);
 				short bunkerid = temp.x;
 				short bunkerarea = temp.y;
-				if(bunkerid > 0)
+				if(bunkerid >= 0)
 				{
 					currentalienbullets--;
 					alienBullet[alienbullet] = 0;
@@ -798,6 +869,7 @@ void bunkerHit(int bunkerId, int hitLocation)
 	//paintBunker(bunkerId);
 	int row, col;
 	point_t hitspot;
+	hitspot.y = BUNKER_Y_VALUE;
 	switch(bunkerId)
 	{
 		case 0:
@@ -813,17 +885,39 @@ void bunkerHit(int bunkerId, int hitLocation)
 			hitspot.x = BUNKER_3_XPOSITION;
 			break;
 	}
+	switch(hitLocation % 4)
+	{
+		case 0:
+			break;
+		case 1:
+			hitspot.x += BUNKER_DAMAGE_WIDTH;
+			break;
+		case 2:
+			hitspot.x += BUNKER_DAMAGE_WIDTH*2;
+			break;
+		case 3:
+			hitspot.x += BUNKER_DAMAGE_WIDTH*3;
+			break;
+
+	}
+	if(hitLocation > 7)
+	{
+		hitspot.y += BUNKER_DAMAGE_HEIGHT *2;
+	}
+	else if(hitLocation > 3)
+	{
+		hitspot.y += BUNKER_DAMAGE_HEIGHT;
+	}
+
 	for(row = 0; row < BUNKER_DAMAGE_HEIGHT; row++)
 	{
 		for(col = 0; col < BUNKER_DAMAGE_WIDTH; col++)
 		{
-			framePointer[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) + 
-				(col + hitLocation) + (bunkerId * SCREEN_WIDTH/4) + BUNKER_OFFSET] = 
+			framePointer[(row + hitspot.y) * SCREEN_WIDTH + hitspot.x + col] =
 					(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 
 			//background
-			framePointerBackground[((BUNKER_Y_VALUE + row) * SCREEN_WIDTH) +
-							(col + hitLocation) + (bunkerId * SCREEN_WIDTH/4) + BUNKER_OFFSET] =
+			framePointerBackground[(row + hitspot.y) * SCREEN_WIDTH + hitspot.x + col] =
 								(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 		}
 	}

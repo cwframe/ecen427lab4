@@ -148,7 +148,7 @@ point_t bunkerHitDetection(point_t position)
     point_t bunkerHit;
     
     int bullet_relative_pos = 0;
-    
+
     if(position.y > BUNKER_Y_VALUE && position.y < (BUNKER_Y_VALUE + BUNKER_HEIGHT))
     {
         
