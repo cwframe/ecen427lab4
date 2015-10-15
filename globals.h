@@ -91,7 +91,7 @@
 
 
 
-typedef struct {unsigned short x; unsigned short y;} point_t;
+typedef struct {short x; short y;} point_t;
 
 
 

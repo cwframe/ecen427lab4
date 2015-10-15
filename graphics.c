@@ -14,7 +14,7 @@
 #include "unistd.h"
 #include "globals.h"
 #include "graphics.h"
-
+#include "gameLogic.h"
 
 
 
@@ -64,7 +64,6 @@ void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 	paintEarthLine();
 	paintScore();
 }
-
 
 void paintShip()
 {
@@ -208,19 +207,53 @@ void paintTankLives()
 }
 
 
+
+int getFirstColAlive()
+{
+	int i, result;
+	for(i = 0; i < NUM_ALIEN_COL; i++)
+	{
+		if(alienAlive[i] || alienAlive[i + NUM_ALIEN_COL] || alienAlive[i + NUM_ALIEN_COL * 2] || alienAlive[i + NUM_ALIEN_COL * 3] || alienAlive[i + NUM_ALIEN_COL * 4])
+		{
+			result = i;
+			break;
+		}
+	}
+	return i;
+}
+
+int  getLastColAlive()
+{
+	int i, result;
+	for(i = NUM_ALIEN_COL-1; i >= 0; i--)
+	{
+		if(alienAlive[i] || alienAlive[i + NUM_ALIEN_COL] || alienAlive[i + NUM_ALIEN_COL * 2] || alienAlive[i + NUM_ALIEN_COL * 3] || alienAlive[i + NUM_ALIEN_COL * 4])
+		{
+			result = i;
+			break;
+		}
+	}
+	return i;
+}
+
+
 //marches the aliens a distance of ALIEN_HORIZONTAL_DISTANCE or ALIEN_VERTICAL_DISTANCE
 //depending on which direction the aliens are moving
 void alienMarch()
 {
+	int leftendofaliens, rightendofaliens;
+	//xil_printf("first = %d, last= %d\n\r", getFirstColAlive(), getLastColAlive());
 	setMovement(!getMovement());
 	//check outofbounds
 	point_t newloc = getAlienLocation();
-	if((newloc.x + (ALIEN_WIDTH * NUM_ALIEN_COL)) + ALIEN_HORIZONTAL_DISTANCE >= SCREEN_WIDTH
+	leftendofaliens = newloc.x + (getFirstColAlive() * ALIEN_WIDTH);
+	rightendofaliens = newloc.x + (ALIEN_WIDTH * (getLastColAlive() + 1));
+	if(rightendofaliens + ALIEN_HORIZONTAL_DISTANCE >= SCREEN_WIDTH
 				&& movementdirection >= 0)
 	{
 		movementdirection--;
 	}
-	else if((newloc.x - ALIEN_HORIZONTAL_DISTANCE) <= 0)
+	else if((leftendofaliens - ALIEN_HORIZONTAL_DISTANCE) <= 0)
 	{
 		movementdirection++;
 	}
@@ -342,7 +375,7 @@ void paintAliens()
 	//erase aliens
 	if(movementdirection != 0)
 	{
-		for(row = 0; row < (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * 4); row++)
+		for(row = 0; row < (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * 4 + 2); row++)
 		{
 			for(col = 0; col < ALIEN_HORIZONTAL_DISTANCE; col++)
 			{
@@ -482,14 +515,32 @@ void fireAlienBullet()
 	{
 		return;
 	}
-	int row, col, pos, color;
+	int row, col, pos, color, i;
 	int aliennum = rand() % NUM_ALIEN_COL;
+	aliennum += NUM_ALIEN_COL * NUM_ALIEN_ROW;
+	/*while(!alienAlive[aliennum])
+	{
+		for(i = 0; i < NUM_ALIEN_ROW; i++)
+		{
+			if(alienAlive[aliennum])
+			{
+				break;
+			}
+			aliennum -= NUM_ALIEN_COL;
+		}
+		if(!alienAlive[aliennum])
+		{
+
+		}
+	}*/
 	//int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; //to be implemented to fire different bullets
 	int bullettype = 0;
 	point_t bulletpos;
 	int currentbullet;
-	bulletpos.y = getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
-	bulletpos.x = getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
+	point_t temp = alienPosition(aliennum);
+	bulletpos.y = temp.y;//getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
+	bulletpos.x = temp.x;//getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
+	xil_printf("%d,%d", temp.y, temp.x);
 	for(row = 0; row < MAX_ALIEN_BULLETS; row++)
 	{
 		if(alienBullet[row] <= 0)
@@ -559,7 +610,7 @@ void eraseAlienBullet(point_t alienbulletpos)
 void bulletMove()
 {
 	//moves tankbullet
-	int row, col, pos, color;
+	int row, col, pos, color, alienhit;
 	point_t bulletpos = getTankBulletPosition();
 	if(bulletpos.y - TANK_BULLET_SPEED < EFFECTIVE_SCREEN_TOP)
 	{
@@ -569,6 +620,7 @@ void bulletMove()
 	{
 		bulletpos.y -= TANK_BULLET_SPEED;
 		setTankBulletPosition(bulletpos);
+		alienhit = alienHitDetection(getTankBulletPosition());
 		for(row = 0; row < TANK_BULLET_HEIGHT; row++)
 		{
 			for(col = 0; col < TANK_BULLET_WIDTH; col++)
@@ -585,7 +637,13 @@ void bulletMove()
 				framePointer[pos] = framePointerBackground[pos];
 			}
 		}
+		if(alienhit >= 0)
+		{
+			killAlien(alienhit);
+			removeTankBullet();
+		}
 	}
+
 	//moves alien bullet
 	int alienbullet;
 	point_t alienbulletpos;

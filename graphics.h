@@ -37,6 +37,9 @@ void paintAliens();
 
 void killAlien(int alienId);
 
+int getFirstColAlive();
+
+int getLastColAlive();
 
 void tankMove(int direction);
 

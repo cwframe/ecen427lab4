@@ -24,8 +24,9 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define BULLET_SPEED 3
 #define BULLET_CHANCE 3
 #define SHIP_MOVE_MAX_TIMER 5
-#define ALIEN_MARCH_SPEED HALF_SECOND
 #define TANK_SPEED 2
+#define ALIEN_MARCH_SPEED QUARTER_SECOND
+
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
 int gameRunTime = 0;
@@ -115,7 +116,7 @@ void timer_interrupt_handler()
     //Tic the clock one second
 	if(secondTimer == SECOND_TIMER_MAX)
 	{
-		xil_printf("1 Second\n");
+//		xil_printf("1 Second\n");
 		secondTimer = 0;
         gameRunTime++;
 	}
