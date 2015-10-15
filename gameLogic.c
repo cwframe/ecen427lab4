@@ -107,19 +107,19 @@ point_t bunkerHitDetection(point_t position)
     if(position.y > BUNKER_Y_VALUE && position.y < (BUNKER_Y_VALUE + BUNKER_HEIGHT))
     {
         
-        if(position.x > BUNKER_1_XPOSITION && position.x < BUNKER_1_XPOSITION + BUNKER_WIDTH)
+        if(position.x > BUNKER_0_XPOSITION && position.x < BUNKER_0_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 0;
         }
-        else if(position.x > BUNKER_2_XPOSITION && position.x < BUNKER_2_XPOSITION + BUNKER_WIDTH)
+        else if(position.x > BUNKER_1_XPOSITION && position.x < BUNKER_1_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 1;
         }
-        else if(position.x > BUNKER_3_XPOSITION && position.x < BUNKER_3_XPOSITION + BUNKER_WIDTH)
+        else if(position.x > BUNKER_2_XPOSITION && position.x < BUNKER_2_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 2;
         }
-        else if(position.x > BUNKER_4_XPOSITION && position.x < BUNKER_4_XPOSITION + BUNKER_WIDTH)
+        else if(position.x > BUNKER_3_XPOSITION && position.x < BUNKER_3_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 3;
         }
@@ -135,22 +135,22 @@ point_t bunkerHitDetection(point_t position)
             switch (bunkerHit.x)
             {
                 case 0:
-                    bullet_relative_pos = position.x - BUNKER_1_XPOSITION;
+                    bullet_relative_pos = position.x - BUNKER_0_XPOSITION;
                     bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
                     
                 case 1:
-                    bullet_relative_pos = position.x - BUNKER_2_XPOSITION;
+                    bullet_relative_pos = position.x - BUNKER_1_XPOSITION;
                     bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
                     
                 case 2:
-                    bullet_relative_pos = position.x - BUNKER_3_XPOSITION;
+                    bullet_relative_pos = position.x - BUNKER_2_XPOSITION;
                     bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
                     
                 case 3:
-                    bullet_relative_pos = position.x - BUNKER_4_XPOSITION;
+                    bullet_relative_pos = position.x - BUNKER_3_XPOSITION;
                     bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
                     break;
                     

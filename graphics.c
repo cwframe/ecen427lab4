@@ -517,8 +517,8 @@ void fireAlienBullet()
 	}
 	int row, col, pos, color, i;
 	int aliennum = rand() % NUM_ALIEN_COL;
-	aliennum += NUM_ALIEN_COL * NUM_ALIEN_ROW;
-	/*while(!alienAlive[aliennum])
+	aliennum += NUM_ALIEN_COL * (NUM_ALIEN_ROW-1);
+	while(!alienAlive[aliennum])
 	{
 		for(i = 0; i < NUM_ALIEN_ROW; i++)
 		{
@@ -528,19 +528,26 @@ void fireAlienBullet()
 			}
 			aliennum -= NUM_ALIEN_COL;
 		}
+		if(aliennum < 0)
+			aliennum = (NUM_ALIEN_ROW-1) * NUM_ALIEN_COL;
 		if(!alienAlive[aliennum])
 		{
-
+			aliennum++;
+			if(aliennum > 10)
+			{
+				aliennum = 0;
+			}
+			aliennum += NUM_ALIEN_COL * (NUM_ALIEN_ROW-1);
 		}
-	}*/
+	}
 	//int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; //to be implemented to fire different bullets
 	int bullettype = 0;
 	point_t bulletpos;
 	int currentbullet;
 	point_t temp = alienPosition(aliennum);
-	bulletpos.y = temp.y;//getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
-	bulletpos.x = temp.x;//getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
-	xil_printf("%d,%d", temp.y, temp.x);
+	bulletpos.y = temp.y + ALIEN_HEIGHT;//getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
+	bulletpos.x = temp.x + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;//getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
+	xil_printf("%d,%d,%d\n\r", aliennum, temp.y, temp.x);
 	for(row = 0; row < MAX_ALIEN_BULLETS; row++)
 	{
 		if(alienBullet[row] <= 0)
@@ -732,6 +739,19 @@ void bulletMove()
 				alienBullet[alienbullet] = 0;
 				eraseAlienBullet(alienbulletpos);
 			}
+			if(alienbulletpos.y + ALIEN_BULLET_HEIGHT > BUNKER_Y_VALUE && alienbulletpos.y < BUNKER_Y_VALUE+BUNKER_HEIGHT)
+			{
+				point_t temp = bunkerHitDetection(alienbulletpos);
+				short bunkerid = temp.x;
+				short bunkerarea = temp.y;
+				if(bunkerid > 0)
+				{
+					currentalienbullets--;
+					alienBullet[alienbullet] = 0;
+					eraseAlienBullet(alienbulletpos);
+					bunkerHit(bunkerid, bunkerarea);
+				}
+			}
 		}
 	}
 }
@@ -777,6 +797,22 @@ void bunkerHit(int bunkerId, int hitLocation)
 
 	//paintBunker(bunkerId);
 	int row, col;
+	point_t hitspot;
+	switch(bunkerId)
+	{
+		case 0:
+			hitspot.x = BUNKER_0_XPOSITION;
+			break;
+		case 1:
+			hitspot.x = BUNKER_1_XPOSITION;
+			break;
+		case 2:
+			hitspot.x = BUNKER_2_XPOSITION;
+			break;
+		case 3:
+			hitspot.x = BUNKER_3_XPOSITION;
+			break;
+	}
 	for(row = 0; row < BUNKER_DAMAGE_HEIGHT; row++)
 	{
 		for(col = 0; col < BUNKER_DAMAGE_WIDTH; col++)
