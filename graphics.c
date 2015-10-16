@@ -532,6 +532,43 @@ void killAlien(int alienId)
 
 }
 
+void paintShipScore(int flash)
+{
+	int row, col, pos, color, i, offset;
+	offset = getShipPos();
+	for(i = 0; i < 3; i++)
+	{
+		for(row = 0; row < ALPHA_NUM_WIDTH; row++)
+		{
+			for(col = 0; col < ALPHA_NUM_HEIGHT; col++)
+			{
+				pos = (row+SAUCER_HEIGHT)*SCREEN_WIDTH + col + offset;
+				switch (i)
+				{
+					case 0:
+						color = ((num_bitmap_3[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+						break;
+					case 1:
+						color = ((num_bitmap_0[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+						break;
+					case 2:
+						color = ((num_bitmap_0[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+						break;
+				}
+				if(!flash)
+				{
+					color = 0;
+				}
+				if(color)
+					framePointer[pos] = RED;
+				else
+					framePointer[pos] = framePointerBackground[pos];
+			}
+		}
+		offset+= ALPHA_NUM_WIDTH;
+	}
+}
+
 //moves the tank in the desired direction, 0 is left, non zero is right
 void tankMove(int direction)
 {
@@ -741,7 +778,19 @@ void bulletMove()
 				removeTankBullet();
 			}
 		}
+		else if(bulletpos.y > SHIP_Y && bulletpos.y < SHIP_Y+SHIP_HEIGHT)
+		{
+			if(motherShipHitDetection(bulletpos))
+			{
+				setShipAlive(0);
+				removeTankBullet();
+				setScore(getScore() + SHIP_SCORE);
+				paintScore();
+			}
+		}
 	}
+
+
 
 	//moves alien bullet
 	int alienbullet;

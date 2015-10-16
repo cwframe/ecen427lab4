@@ -109,7 +109,7 @@ void timer_interrupt_handler()
 
 	if(getShipActive())
 	{
-        if(getShipAlive)
+        if(getShipAlive())
         {
             if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
             {
@@ -122,11 +122,15 @@ void timer_interrupt_handler()
             if(secondTimer % TENTH_SECOND == 0)
             {
                 //paint 300
+            	xil_printf("POINTS!!!!\n\r");
+            	paintShipScore(1);
                 saucerFlash++;
             }
             else
             {
                 //paint black
+            	paintShipScore(0);
+            	xil_printf("BLACK!!!!\n\r");
             }
             if(saucerFlash >= FLASH_MAX)
             {
@@ -140,8 +144,9 @@ void timer_interrupt_handler()
 
 	if(gameRunTime % (30 + rand()%15 + 1))
 	{
-		if(!getShipAlive())
+		if(!getShipActive())
 		{
+			setShipActive(1);
 			setShipAlive(1);
 		}
 	}

@@ -72,6 +72,8 @@ void paintScore();
 
 void paintShip();
 
+void paintShipScore(int flash);
+
 void marchShip();
 
 void removeShip();

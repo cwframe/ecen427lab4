@@ -15,7 +15,7 @@ int  alienHitDetection(point_t position);
 point_t alienPosition(int alienNumber);
 point_t bunkerHitDetection(point_t position);
 int tankHitDetection(point_t bulletPosition);
-int motherShipHitDetection(point_t bulletPosition)
+int motherShipHitDetection(point_t bulletPosition);
 
 
 #endif /* GAMELOGIC_H_ */
