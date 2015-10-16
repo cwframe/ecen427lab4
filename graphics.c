@@ -535,14 +535,14 @@ void killAlien(int alienId)
 void paintShipScore(int flash)
 {
 	int row, col, pos, color, i, offset;
-	offset = getShipPos();
+	offset = 0;
 	for(i = 0; i < 3; i++)
 	{
 		for(row = 0; row < ALPHA_NUM_WIDTH; row++)
 		{
 			for(col = 0; col < ALPHA_NUM_HEIGHT; col++)
 			{
-				pos = (row+SAUCER_HEIGHT)*SCREEN_WIDTH + col + offset;
+				pos = (row+SHIP_Y)*SCREEN_WIDTH + col + getShipPos() + offset;
 				switch (i)
 				{
 					case 0:
