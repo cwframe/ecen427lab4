@@ -122,7 +122,7 @@ void timer_interrupt_handler()
             if(secondTimer % TENTH_SECOND == 0)
             {
                 //paint 300
-            	xil_printf("POINTS!!!!\n\r");
+
             	paintShipScore(1);
                 saucerFlash++;
             }
@@ -130,7 +130,7 @@ void timer_interrupt_handler()
             {
                 //paint black
             	paintShipScore(0);
-            	xil_printf("BLACK!!!!\n\r");
+
             }
             if(saucerFlash >= FLASH_MAX)
             {

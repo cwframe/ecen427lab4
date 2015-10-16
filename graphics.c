@@ -1045,24 +1045,33 @@ void bunkerHit(int bunkerId, int hitLocation)
 					break;
 				case 1:
 					color = ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+
 					break;
 				case 2:
 					color = ((bunkerDamage1[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+
 					break;
 				case 3:
 					color = ((bunkerDamage2[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+
 					break;
 				case 4:
 					color = ((bunkerDamage3[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 					break;
 			}
-			if(color)
+			if(!color)
+			{
 				framePointer[pos] =	GREEN;
+				framePointerBackground[pos] =	GREEN;
+			}
 			else
-				framePointer[pos] = framePointerBackground[pos];
+			{
+				framePointer[pos] = BLACK;
+				framePointerBackground[pos] = BLACK;
+			}
 
 			//background
-			framePointerBackground[pos] = (GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+			//framePointerBackground[pos] = (GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 		}
 	}
 
