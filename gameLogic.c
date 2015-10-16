@@ -97,29 +97,34 @@ int alienHitDetection(point_t position)
 
 
 
+
 //This function uses the point_t in a different way, the x value is the Bunker ID that was hit and the y value is the X segment of the bunker that was hit
 point_t bunkerHitDetection(point_t position)
 {
     point_t bunkerHit;
+    char bunkerHitBool = 0;
+    char bunkerHitX = 0;
+    char bunkerHitY = 0;
+    int bitmapX = -1;
+    int bitmapY = -1;
     
-    int bullet_relative_pos = 0;
-
-    if(position.y > BUNKER_Y_VALUE && position.y < (BUNKER_Y_VALUE + BUNKER_HEIGHT))
+    
+    if(position.y >= BUNKER_Y_VALUE && position.y < (BUNKER_Y_VALUE + BUNKER_HEIGHT))
     {
         
-        if(position.x > BUNKER_0_XPOSITION && position.x < BUNKER_0_XPOSITION + BUNKER_WIDTH)
+        if(position.x >= BUNKER_0_XPOSITION && position.x < BUNKER_0_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 0;
         }
-        else if(position.x > BUNKER_1_XPOSITION && position.x < BUNKER_1_XPOSITION + BUNKER_WIDTH)
+        else if(position.x >= BUNKER_1_XPOSITION && position.x < BUNKER_1_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 1;
         }
-        else if(position.x > BUNKER_2_XPOSITION && position.x < BUNKER_2_XPOSITION + BUNKER_WIDTH)
+        else if(position.x >= BUNKER_2_XPOSITION && position.x < BUNKER_2_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 2;
         }
-        else if(position.x > BUNKER_3_XPOSITION && position.x < BUNKER_3_XPOSITION + BUNKER_WIDTH)
+        else if(position.x >= BUNKER_3_XPOSITION && position.x < BUNKER_3_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 3;
         }
@@ -135,23 +140,72 @@ point_t bunkerHitDetection(point_t position)
             switch (bunkerHit.x)
             {
                 case 0:
-                    bullet_relative_pos = position.x - BUNKER_0_XPOSITION;
-                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
+                    bitmapX = position.x - BUNKER_0_XPOSITION;
+                    bitmapY = position.y - BUNKER_Y_VALUE;
+                    
+                    if(bitmapX < 24)
+                    {
+                        bunkerHitBool = ((bunkerLeft[bitmapY] >> ((BUNKER_WIDTH/2)-1-bitmapX)) & MASK_ONE);
+                    }
+                    else
+                    {
+                        bunkerHitBool = ((bunkerRight[bitmapY] >> ((BUNKER_WIDTH/2)-1-(bitmapX - 24))) & MASK_ONE);
+                    }
+                    
+                    bunkerHitX = (bitmapX / (BUNKER_WIDTH/4));
+                    bunkerHitY = (bitmapY / (BUNKER_HEIGHT/3));
                     break;
                     
                 case 1:
-                    bullet_relative_pos = position.x - BUNKER_1_XPOSITION;
-                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
+                    bitmapX = position.x - BUNKER_1_XPOSITION;
+                    bitmapY = position.y - BUNKER_Y_VALUE;
+                    
+                    if(bitmapX < 24)
+                    {
+                        bunkerHitBool = ((bunkerLeft[bitmapY] >> ((BUNKER_WIDTH/2)-1-bitmapX)) & MASK_ONE);
+                    }
+                    else
+                    {
+                        bunkerHitBool = ((bunkerRight[bitmapY] >> ((BUNKER_WIDTH/2)-1-(bitmapX - 24))) & MASK_ONE);
+                    }
+                    
+                    bunkerHitX = (bitmapX / (BUNKER_WIDTH/4));
+                    bunkerHitY = (bitmapY / (BUNKER_HEIGHT/3));
                     break;
                     
                 case 2:
-                    bullet_relative_pos = position.x - BUNKER_2_XPOSITION;
-                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
+                    bitmapX = position.x - BUNKER_2_XPOSITION;
+                    bitmapY = position.y - BUNKER_Y_VALUE;
+                    
+                    if(bitmapX < 24)
+                    {
+                        bunkerHitBool = ((bunkerLeft[bitmapY] >> ((BUNKER_WIDTH/2)-1-bitmapX)) & MASK_ONE);
+                    }
+                    else
+                    {
+                        bunkerHitBool = ((bunkerRight[bitmapY] >> ((BUNKER_WIDTH/2)-1-(bitmapX - 24))) & MASK_ONE);
+                    }
+                    
+                    bunkerHitX = (bitmapX / (BUNKER_WIDTH/4));
+                    bunkerHitY = (bitmapY / (BUNKER_HEIGHT/3));
                     break;
                     
+                    
                 case 3:
-                    bullet_relative_pos = position.x - BUNKER_3_XPOSITION;
-                    bullet_relative_pos = (bullet_relative_pos / (BUNKER_WIDTH/4));
+                    bitmapX = position.x - BUNKER_3_XPOSITION;
+                    bitmapY = position.y - BUNKER_Y_VALUE;
+                    
+                    if(bitmapX < 24)
+                    {
+                        bunkerHitBool = ((bunkerLeft[bitmapY] >> ((BUNKER_WIDTH/2)-1-bitmapX)) & MASK_ONE);
+                    }
+                    else
+                    {
+                        bunkerHitBool = ((bunkerRight[bitmapY] >> ((BUNKER_WIDTH/2)-1-(bitmapX - 24))) & MASK_ONE);
+                    }
+                    
+                    bunkerHitX = (bitmapX / (BUNKER_WIDTH/4));
+                    bunkerHitY = (bitmapY / (BUNKER_HEIGHT/3));
                     break;
                     
                 default:
@@ -159,9 +213,19 @@ point_t bunkerHitDetection(point_t position)
             }
         }
     }
+    
     //Add the x segment to the point
-    bunkerHit.y = bullet_relative_pos;
-    return bunkerHit;
+    bunkerHit.y = (bunkerHitY * 4) + bunkerHitX;
+    if(bunkerHitBool)
+    {
+        return bunkerHit;
+    }
+    else
+    {
+        bunkerHit.x = -1;
+        bunkerHit.y = -1;
+        return bunkerHit;
+    }
 }
 
 
