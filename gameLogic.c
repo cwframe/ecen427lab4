@@ -113,6 +113,7 @@ point_t bunkerHitDetection(point_t position)
     {
         
         if(position.x >= BUNKER_0_XPOSITION && position.x < BUNKER_0_XPOSITION + BUNKER_WIDTH)
+
         {
             bunkerHit.x = 0;
         }
