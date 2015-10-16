@@ -45,7 +45,6 @@ void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 	framePointerBackground = framePointerbg;
 	paintWords();
 	paintTankLives();
-	paintAliens();
 	paintTank();
 	paintBunker(1);
 	paintBunker(2);
@@ -346,153 +345,145 @@ void alienMarch()
 		newloc.y += ALIEN_VERTICAL_DISTANCE;
 	}
 	setAlienLocation(newloc);
-	paintAliens(framePointer);
+	paintAliens();
+}
+
+
+
+void paintAlien(int alienId)
+{
+	int alien_col, row, inbetween, col, alien_row, aliencolor, pos;
+	point_t alienpos = alienPosition(alienId);
+	for(row = 0; row < ALIEN_HEIGHT; row++)
+	{
+		for(col = 0; col < ALIEN_WIDTH; col++)
+		{
+			pos = (row + alienpos.y)*SCREEN_WIDTH + col + alienpos.x;
+			if(getMovement())
+			{
+				if(alienId < NUM_ALIEN_COL)
+					aliencolor = ((alien_top_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+				else if(alienId < NUM_ALIEN_COL * 3)
+					aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+				else
+					aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+			}
+			else
+			{
+				if(alienId < NUM_ALIEN_COL)
+					aliencolor = ((alien_top_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+				else if(alienId < NUM_ALIEN_COL * 3)
+					aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+				else
+					aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+			}
+			if(aliencolor)
+				framePointer[pos] = WHITE;
+			else
+				framePointer[pos] = framePointerBackground[pos];
+		}
+	}
+}
+
+void eraseExplosion(alienId)
+{
+	int row, col, pos;
+	alienAlive[alienId] = 0;
+	point_t alienpos = alienPosition(alienId);
+	for(row = 0; row < EXPLOSION_HEIGHT + 2; row++)
+	{
+		for(col = EXPLOSION_ERASE_COL_START; col < ALIEN_WIDTH; col++)
+		{
+			pos = (row + alienpos.y)*SCREEN_WIDTH + col + alienpos.x;
+			framePointer[pos] = framePointerBackground[pos];
+		}
+	}
+}
+
+void eraseTrail(int alienId)
+{
+	if(alienId < NUM_ALIEN_COL || movementdirection <= 0)
+	{
+		//no trails left
+		return;
+	}
+	int row, col, pos;
+	point_t alienpos = alienPosition(alienId);
+	for(row = 0; row < ALIEN_HEIGHT; row++)
+	{
+		for(col = 1; col <= ALIEN_HORIZONTAL_DISTANCE; col++)
+		{
+			pos = (row + alienpos.y)*SCREEN_WIDTH - col + alienpos.x + ALIEN_WIDTH;
+			framePointer[pos] = framePointerBackground[pos];
+		}
+	}
+}
+
+void eraseFirstTrail()
+{
+	int row, col, pos, alienId, i;
+	for(i = 1; i < NUM_ALIEN_COL; i++)
+	{
+		alienId = i*NUM_ALIEN_COL;
+		if(alienAlive[alienId])
+		{
+			point_t alienpos = alienPosition(alienId);
+			for(row = 0; row < ALIEN_HEIGHT; row++)
+			{
+				for(col = 0; col < ALIEN_HORIZONTAL_DISTANCE; col++)
+				{
+					pos = (row + alienpos.y)*SCREEN_WIDTH + col + alienpos.x - ALIEN_HORIZONTAL_DISTANCE;
+					framePointer[pos] = framePointerBackground[pos];
+				}
+			}
+		}
+	}
+}
+
+void eraseInBetweenRows()
+{
+	int row, col, pos, alienId, i;
+	alienId = i*NUM_ALIEN_COL;
+	for(i = 0; i < NUM_ALIEN_COL * NUM_ALIEN_ROW; i++)
+	{
+		alienId = i;
+		if(alienAlive[alienId])
+		{
+			point_t alienpos = alienPosition(alienId);
+			for(row = 1; row <= ALIEN_VERTICAL_DISTANCE; row++)
+			{
+				for(col = 0; col < ALIEN_WIDTH; col++)
+				{
+					pos = (alienpos.y - row)*SCREEN_WIDTH + col + alienpos.x;
+					framePointer[pos] = framePointerBackground[pos];
+				}
+			}
+		}
+	}
+
 }
 
 void paintAliens()
 {
-	int alien_col, row, inbetween, col, alien_row, aliencolor, pos;
-	for(alien_row = 0; alien_row < NUM_ALIEN_ROW; alien_row++)
+	int  row, col, pos, i;
+	for(i = 0; i < NUM_ALIEN_COL*NUM_ALIEN_ROW; i++)
 	{
-		for (alien_col = 0; alien_col < NUM_ALIEN_COL; alien_col++)
+		if(alienAlive[i] == 1)
+			paintAlien(i);
+		else if (alienAlive[i] > 1)
 		{
-			for(row = 0; row < EXPLOSION_HEIGHT; row++)
-			{
-				for(col = 0; col < ALIEN_WIDTH; col++)
-				{
-					if(alienAlive[(alien_row * NUM_ALIEN_COL) + alien_col] && row < ALIEN_HEIGHT)
-					{
-						switch (alien_row)
-						{
-							case 0:
-								pos = (row + getAlienLocation().y)*SCREEN_WIDTH + col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_top_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_top_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							case 1:
-								pos = (row + getAlienLocation().y + ALIEN_HEIGHT + ROW_SPACING) *SCREEN_WIDTH +
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							case 2:
-								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
-											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							case 3:
-								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH
-											+ col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-
-								break;
-							case 4:
-								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
-											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							default:
-								break;
-						}
-						if (aliencolor)
-						{
-							if(framePointer[pos] != WHITE)
-								framePointer[pos] = WHITE;
-						}
-						else
-						{
-							if(framePointer[pos] != framePointerBackground[pos])
-								framePointer[pos] = framePointerBackground[pos];
-						}
-					}
-					else
-					{
-						pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
-								col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-						framePointer[pos] = framePointerBackground[pos];
-					}
-				}
-			}
+			eraseExplosion(i);
+		}
+		else
+		{
+			//print black square
+			eraseTrail(i);
 		}
 	}
-	//erase aliens
-	if(movementdirection != 0)
+	eraseFirstTrail();
+	if(movementdirection == 0)
 	{
-		for(row = 0; row < (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * 4 + 2); row++)
-		{
-			for(col = 0; col < ALIEN_HORIZONTAL_DISTANCE; col++)
-			{
-				if(movementdirection > 0)
-				{
-					pos = (getAlienLocation().y+row)*SCREEN_WIDTH +
-							(getAlienLocation().x-col-1);
-					framePointer[pos] = framePointerBackground[pos]; //black out part left behind
-				}
-				else
-				{
-					pos = (getAlienLocation().y+row)*SCREEN_WIDTH +
-							(getAlienLocation().x + col + 1+  (ALIEN_WIDTH * NUM_ALIEN_COL));
-					framePointer[pos]  = framePointerBackground[pos]; //black out part left behind
-				}
-			}
-		}
-	}
-	else
-	{
-		for(inbetween = 0; inbetween < NUM_ALIEN_ROW; inbetween++)
-		{
-			for(row = 1; row <= ALIEN_VERTICAL_DISTANCE; row++)
-			{
-				for(col = 0; col < (ALIEN_WIDTH * NUM_ALIEN_COL); col++)
-				{
-					if(inbetween && row <= ROW_SPACING)
-					{
-						pos = ((getAlienLocation().y - row) + (inbetween * ALIEN_HEIGHT) + (ROW_SPACING * inbetween))*SCREEN_WIDTH +
-								(getAlienLocation().x) + col;
-						framePointer[pos] = framePointerBackground[pos]; //black out part left behind
-					}
-					else if(!inbetween)
-					{
-						pos = ((getAlienLocation().y - row) + (inbetween * ALIEN_HEIGHT))*SCREEN_WIDTH +
-								(getAlienLocation().x) + col;
-						framePointer[pos] = framePointerBackground[pos]; //black out part left behind
-					}
-				}
-			}
-		}
+		eraseInBetweenRows();
 	}
 }
 
@@ -500,7 +491,7 @@ void killAlien(int alienId)
 {
 	if(alienId >= 0 && alienId < NUM_ALIEN_COL * NUM_ALIEN_ROW)
 	{
-		alienAlive[alienId] = 0;
+		alienAlive[alienId] = 2;
 		removeTankBullet();
 		if(alienId < NUM_ALIEN_COL)
 			setScore(getScore()+TOP_ALIEN_SCORE);
@@ -1104,7 +1095,101 @@ int getAlienAlive(int alienID)
 
 
 
+//old paint aliens
+/*for(alien_row = 0; alien_row < NUM_ALIEN_ROW; alien_row++)
+	{
+		for (alien_col = 0; alien_col < NUM_ALIEN_COL; alien_col++)
+		{
+			for(row = 0; row < EXPLOSION_HEIGHT; row++)
+			{
+				for(col = 0; col < ALIEN_WIDTH; col++)
+				{
+					if(alienAlive[(alien_row * NUM_ALIEN_COL) + alien_col] && row < ALIEN_HEIGHT)
+					{
+						switch (alien_row)
+						{
+							case 0:
+								pos = (row + getAlienLocation().y)*SCREEN_WIDTH + col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+								if (getMovement())
+								{
+									aliencolor = ((alien_top_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								else
+								{
+									aliencolor = ((alien_top_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								break;
+							case 1:
+								pos = (row + getAlienLocation().y + ALIEN_HEIGHT + ROW_SPACING) *SCREEN_WIDTH +
+										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+								if (getMovement())
+								{
+									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								else
+								{
+									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								break;
+							case 2:
+								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
+											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+								if (getMovement())
+								{
+									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								else
+								{
+									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								break;
+							case 3:
+								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH
+											+ col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+								if (getMovement())
+								{
+									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								else
+								{
+									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
 
+								break;
+							case 4:
+								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
+											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+								if (getMovement())
+								{
+									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								else
+								{
+									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
+								}
+								break;
+							default:
+								break;
+						}
+						if (aliencolor)
+						{
+								framePointer[pos] = WHITE;
+						}
+						else
+						{
+								framePointer[pos] = framePointerBackground[pos];
+						}
+					}
+					else
+					{
+						pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
+								col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
+						framePointer[pos] = framePointerBackground[pos];
+					}
+				}
+			}
+		}
+	}*/
 
 
 

@@ -122,7 +122,6 @@ void timer_interrupt_handler()
             if(secondTimer % TENTH_SECOND == 0)
             {
                 //paint 300
-
             	paintShipScore(1);
                 saucerFlash++;
             }
@@ -130,7 +129,6 @@ void timer_interrupt_handler()
             {
                 //paint black
             	paintShipScore(0);
-
             }
             if(saucerFlash >= FLASH_MAX)
             {

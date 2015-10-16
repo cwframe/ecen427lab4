@@ -28,7 +28,7 @@ void globals_init()
 {
 	movement = 0;
 	numtankbullet = 0;
-	tankpos = SCREEN_WIDTH/2 - TANK_WIDTH/2;
+	tankpos = BUNKER_1_XPOSITION;
 	tankBullet.x = 0;
 	tankBullet.y = 0;
 	alienlocation.x = 0;
