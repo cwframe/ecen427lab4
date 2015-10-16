@@ -49,11 +49,8 @@ int alienHitDetection(point_t position)
     int tempX = 0;
     int tempY = 0;
     
-    
-    
     point_t alienLocation = getAlienLocation();
     
-    //Detect if the point hits the alien bitmap
     //Get the X position
     if(position.x > alienLocation.x && position.x < (alienLocation.x + (NUM_ALIEN_COL * ALIEN_WIDTH)))
     {
@@ -87,51 +84,9 @@ int alienHitDetection(point_t position)
         }
     }
     
-    //now that the alien number has been determined, find out if the point hits the alien within the bitmap
     if(alienNumber >= 0 && getAlienAlive(alienNumber))
     {
-        //calculate bitmap relative position
-        int bitmapX = 0;
-        int bitmapY = 0;
-        char alienHit = 0;
-        
-        bitmapX = position.x - (alienLocation.x + (ALIEN_WIDTH * tempX));
-        bitmapY = position.y - (alienLocation.y + (ALIEN_HEIGHT * tempY) + (ROW_SPACING * tempY));
-        
-        switch(tempY)
-        {
-            case 0:
-                alienHit = ((alien_top_out[bitmapY] >> (ALIEN_WIDTH-1-bitmapX)) & MASK_ONE);
-                break;
-                
-            case 1:
-                alienHit = ((alien_middle_out[bitmapY] >> (ALIEN_WIDTH-1-bitmapX)) & MASK_ONE);
-                break;
-                
-            case 2:
-                alienHit = ((alien_middle_out[bitmapY] >> (ALIEN_WIDTH-1-bitmapX)) & MASK_ONE);
-                break;
-                
-            case 3:
-                alienHit = ((alien_bottom_out[bitmapY] >> (ALIEN_WIDTH-1-bitmapX)) & MASK_ONE);
-                break;
-                
-            case 4:
-                alienHit = ((alien_bottom_out[bitmapY] >> (ALIEN_WIDTH-1-bitmapX)) & MASK_ONE);
-                break;
-                
-            default:
-                break;
-        }
-        
-        if(alienHit)
-        {
-            return alienNumber;
-        }
-        else
-        {
-            return -1;
-        }
+        return alienNumber;
     }
     else
     {
@@ -151,8 +106,6 @@ point_t bunkerHitDetection(point_t position)
 
     if(position.y > BUNKER_Y_VALUE && position.y < (BUNKER_Y_VALUE + BUNKER_HEIGHT))
     {
-        
-
         if(position.x > BUNKER_0_XPOSITION && position.x < BUNKER_0_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 0;
@@ -239,17 +192,23 @@ point_t alienPosition(int alienNumber)
 
 int tankHitDetection(point_t bulletPosition)
 {
-    unsigned short tankPosition = 0;
-    //unsigned short getTankPositionGlobal();
+    unsigned short tankPosition = getTankPositionGlobal();
+    int bitmapX = 0;
+    int bitmapY = 0;
+    int tankHit = 0;
+    
+    bitmapX = bulletPosition.x - tankPosition;
+    bitmapY = bulletPosition.y - TANK_Y_VALUE;
     
     if(bulletPosition.y >= TANK_Y_VALUE && bulletPosition.y < (TANK_Y_VALUE + TANK_HEIGHT))
     {
         if(bulletPosition.x >= tankPosition && bulletPosition.x < tankPosition + TANK_WIDTH)
         {
-            return 1;
+            
+            tankHit = ((tank[bitmapY] >> (TANK_WIDTH-1-bitmapX)) & MASK_ONE);
         }
     }
-    return -1;
+    return tankHit;
 }
 
 
