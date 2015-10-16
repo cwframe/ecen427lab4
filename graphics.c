@@ -597,14 +597,14 @@ void fireAlienBullet()
 			aliennum += NUM_ALIEN_COL * (NUM_ALIEN_ROW-1);
 		}
 	}
-	//int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; //to be implemented to fire different bullets
-	int bullettype = 0;
+	int bullettype = rand() % NUM_ALIEN_BULLET_TYPES; //to be implemented to fire different bullets
+	//int bullettype = 1;
 	point_t bulletpos;
 	int currentbullet;
 	point_t temp = alienPosition(aliennum);
 	bulletpos.y = temp.y + ALIEN_HEIGHT;//getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
 	bulletpos.x = temp.x + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;//getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
-	xil_printf("%d,%d,%d\n\r", aliennum, temp.y, temp.x);
+	//xil_printf("%d,%d,%d\n\r", aliennum, temp.y, temp.x);
 	for(row = 0; row < MAX_ALIEN_BULLETS; row++)
 	{
 		if(alienBullet[row] <= 0)
@@ -618,17 +618,16 @@ void fireAlienBullet()
 	{
 		for(col = 0; col < ALIEN_BULLET_WIDTH; col++)
 		{
+			pos = (row + bulletpos.y)*SCREEN_WIDTH + col + bulletpos.x;
 			if(!bullettype) //paints the correct bullet
 			{
 				alienBullet[currentbullet] = 1;
-				pos = (row + bulletpos.y)*SCREEN_WIDTH + col + bulletpos.x;
 				color = ((alien_bullet1_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
 
 			}
 			else
 			{
-				alienBullet[currentalienbullets] = 5;
-				pos = (row + bulletpos.y)*SCREEN_WIDTH + col + bulletpos.x;
+				alienBullet[currentbullet] = 5;
 				color = ((alien_bullet2_1[row] >> (ALIEN_BULLET_WIDTH-1-col)) & MASK_ONE);
 			}
 			if(color)
@@ -684,7 +683,9 @@ void bulletMove()
 	{
 		bulletpos.y -= TANK_BULLET_SPEED;
 		setTankBulletPosition(bulletpos);
-		alienhit = alienHitDetection(getTankBulletPosition());
+		point_t hitbulletpoint = getTankBulletPosition();
+		hitbulletpoint.x += TANK_BULLET_WIDTH/2;
+		alienhit = alienHitDetection(hitbulletpoint);
 		for(row = 0; row < TANK_BULLET_HEIGHT; row++)
 		{
 			for(col = 0; col < TANK_BULLET_WIDTH; col++)
@@ -734,6 +735,7 @@ void bulletMove()
 			alienbulletpos.y += ALIEN_BULLET_SPEED;
 
 			updateAlienBulletPos(alienbulletpos, alienbullet);
+			alienbulletpos = getAlienBulletPos()[alienbullet];
 			for(row = 0; row < ALIEN_BULLET_HEIGHT; row++)
 			{
 				for(col = 0; col < ALIEN_BULLET_WIDTH; col++)
@@ -770,6 +772,7 @@ void bulletMove()
 						framePointer[pos] = WHITE;
 					else
 						framePointer[pos] = framePointerBackground[pos];
+
 					if(row <= ALIEN_BULLET_SPEED && row > 0)
 					{
 						pos = (alienbulletpos.y - row) * SCREEN_WIDTH + col + alienbulletpos.x;
@@ -804,7 +807,7 @@ void bulletMove()
 					alienBullet[alienbullet] = 5;
 					break;
 			}
-			if(alienbulletpos.y > GREEN_EARTH_LINE_Y - ALIEN_BULLET_HEIGHT)
+			if(alienbulletpos.y + ALIEN_BULLET_HEIGHT> GREEN_EARTH_LINE_Y )
 			{
 				currentalienbullets--;
 				alienBullet[alienbullet] = 0;
@@ -812,15 +815,30 @@ void bulletMove()
 			}
 			if(alienbulletpos.y + ALIEN_BULLET_HEIGHT > BUNKER_Y_VALUE && alienbulletpos.y < BUNKER_Y_VALUE+BUNKER_HEIGHT)
 			{
-				point_t temp = bunkerHitDetection(alienbulletpos);
+				point_t alienbullethitpoint = alienbulletpos;
+				alienbullethitpoint.y += ALIEN_BULLET_HEIGHT;
+				alienbullethitpoint.x += ALIEN_BULLET_WIDTH/2;
+				point_t temp = bunkerHitDetection(alienbullethitpoint);
 				short bunkerid = temp.x;
 				short bunkerarea = temp.y;
-				if(bunkerid >= 0)
+				if(bunkerid >= 0 && bunkerid <= 3 && bunkerarea >= 0 && bunkerarea <= 11) //check magic numbers
 				{
 					currentalienbullets--;
 					alienBullet[alienbullet] = 0;
 					eraseAlienBullet(alienbulletpos);
 					bunkerHit(bunkerid, bunkerarea);
+				}
+			}
+			if(alienbulletpos.y > TANK_Y_VALUE && alienbulletpos.y < TANK_Y_VALUE + TANK_HEIGHT)
+			{
+				point_t alienbullethitpoint = alienbulletpos;
+				alienbullethitpoint.y += ALIEN_BULLET_HEIGHT;
+				alienbullethitpoint.x += ALIEN_BULLET_WIDTH/2;
+				if(tankHitDetection(alienbullethitpoint))
+				{
+					xil_printf("TANKHIT\n\r");
+					//GAMEOVER
+					//exit(0);
 				}
 			}
 		}
@@ -913,12 +931,11 @@ void bunkerHit(int bunkerId, int hitLocation)
 	{
 		for(col = 0; col < BUNKER_DAMAGE_WIDTH; col++)
 		{
-			framePointer[(row + hitspot.y) * SCREEN_WIDTH + hitspot.x + col] =
-					(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+			int pos = (row + hitspot.y) * SCREEN_WIDTH + hitspot.x + col;
+			framePointer[pos] =	(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 
 			//background
-			framePointerBackground[(row + hitspot.y) * SCREEN_WIDTH + hitspot.x + col] =
-								(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+			framePointerBackground[pos] = (GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 		}
 	}
 

@@ -147,26 +147,12 @@ point_t bunkerHitDetection(point_t position)
 {
     point_t bunkerHit;
     
-    int bullet_relative_pos = 0;
+    int bullet_relative_pos = -1;
 
     if(position.y > BUNKER_Y_VALUE && position.y < (BUNKER_Y_VALUE + BUNKER_HEIGHT))
     {
         
-<<<<<<< HEAD
-        if(position.x >= BUNKER_1_XPOSITION && position.x < BUNKER_1_XPOSITION + BUNKER_WIDTH)
-        {
-            bunkerHit.x = 0;
-        }
-        else if(position.x >= BUNKER_2_XPOSITION && position.x < BUNKER_2_XPOSITION + BUNKER_WIDTH)
-        {
-            bunkerHit.x = 1;
-        }
-        else if(position.x >= BUNKER_3_XPOSITION && position.x < BUNKER_3_XPOSITION + BUNKER_WIDTH)
-        {
-            bunkerHit.x = 2;
-        }
-        else if(position.x >= BUNKER_4_XPOSITION && position.x < BUNKER_4_XPOSITION + BUNKER_WIDTH)
-=======
+
         if(position.x > BUNKER_0_XPOSITION && position.x < BUNKER_0_XPOSITION + BUNKER_WIDTH)
         {
             bunkerHit.x = 0;
@@ -180,7 +166,6 @@ point_t bunkerHitDetection(point_t position)
             bunkerHit.x = 2;
         }
         else if(position.x > BUNKER_3_XPOSITION && position.x < BUNKER_3_XPOSITION + BUNKER_WIDTH)
->>>>>>> origin/master
         {
             bunkerHit.x = 3;
         }
