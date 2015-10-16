@@ -12,6 +12,8 @@ void handleButton();
 void input(char c);
 void interrupt_handler_dispatcher(void* ptr);
 void timer_interrupt_handler();
+void pauseGame();
+void resumeGame();
 
 
 #endif /* INPUT_H_ */

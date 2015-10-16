@@ -15,8 +15,14 @@
 #include "globals.h"
 #include "graphics.h"
 #include "gameLogic.h"
+#include "input.h"
 #include "xgpio.h"
 
+
+#define TANK_MOVE_LEFT_MASK 8
+#define TANK_MOVE_RIGHT_MASK 2
+#define TANK_MOVE (TANK_MOVE_LEFT_MASK + TANK_MOVE_RIGHT_MASK)
+#define FIRE_BULLET_MASK 1
 
 XGpio gpPB;
 //Returns the number of the current button that is being pressed
@@ -24,15 +30,24 @@ void handleButton(int currentButtonState)
 {
     currentButtonState = XGpio_DiscreteRead(&gpPB, 1);  // Get the current state of the buttons.
     
-    if(currentButtonState == 8)
+    if(currentButtonState)
+    {
+    	if(getLives() > 0)
+    	{
+			paintTank();
+			resumeGame();
+    	}
+    }
+
+    if(currentButtonState & TANK_MOVE_LEFT_MASK)
     {
         tankMove(0);
     }
-    else if(currentButtonState == 2)
+    if(currentButtonState & TANK_MOVE_RIGHT_MASK)
     {
         tankMove(1);
     }
-    else if(currentButtonState == 1)
+    if(currentButtonState & FIRE_BULLET_MASK)
     {
         fireBullet();
     }

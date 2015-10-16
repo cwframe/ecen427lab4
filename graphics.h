@@ -43,6 +43,8 @@ int getLastColAlive();
 
 void tankMove(int direction);
 
+void paintTankDead();
+
 void paintTank();
 
 void bulletMove();

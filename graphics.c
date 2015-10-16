@@ -14,6 +14,7 @@
 #include "unistd.h"
 #include "globals.h"
 #include "graphics.h"
+#include "input.h"
 #include "gameLogic.h"
 
 
@@ -33,6 +34,7 @@ int alienAlive[NUM_ALIEN_COL * NUM_ALIEN_ROW];
 int alienBullet[MAX_ALIEN_BULLETS];
 int currentalienbullets;
 int shipdirection;
+int oldscorearray[4] = {-1,-1,-1,-1};
 
 void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
@@ -188,76 +190,94 @@ int getHundreds()
 
 int getTens()
 {
-	return (getScore() - (getThousands() * 1000) + getHundreds() * 100)/10;
+	return (getScore() - ((getThousands() * 1000) + getHundreds() * 100))/10;
 }
 
 int getOnes()
 {
-	return (getScore() - (getThousands() * 1000) + getHundreds() * 100 + getTens()*10);
+	return (getScore() - ((getThousands() * 1000) + getHundreds() * 100 + getTens()*10));
 }
 
 void paintScore()
 {
-	int row, col, pos, color;
-	int score = getScore();
+	int row, col, pos, color, i, num;
 	int offset = SCORE_NUM_X;
-	for(row = 0; row < ALPHA_NUM_HEIGHT; row++)
+	int scorearray[4] = {getThousands(), getHundreds(), getTens(), getOnes()};
+	for(i = 0; i < 4; i++)
 	{
-		for(col = 0; col < ALPHA_NUM_WIDTH; col++)
+		num = scorearray[i];
+		if(scorearray[i] != oldscorearray[i])
 		{
-			int num;//getChar
-			pos = (row + SCORE_Y) * SCREEN_WIDTH + col + offset;
-			switch(num)
+			oldscorearray[i] = scorearray[i];
+			for(row = 0; row < ALPHA_NUM_HEIGHT; row++)
 			{
-				case 0:
-					color = ((num_bitmap_0[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 1:
-					if(col < NUM_1_WIDTH)
-						color = ((num_bitmap_1[row] >> (NUM_1_WIDTH-1-col)) & MASK_ONE);
+				for(col = 0; col < ALPHA_NUM_WIDTH; col++)
+				{
+
+					pos = (row + SCORE_Y)*SCREEN_WIDTH + col + offset;
+					switch(num)
+					{
+						case 0:
+							color = ((num_bitmap_0[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 1:
+							color = ((num_bitmap_1[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 2:
+							color = ((num_bitmap_2[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 3:
+							color = ((num_bitmap_3[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 4:
+							color = ((num_bitmap_4[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 5:
+							color = ((num_bitmap_5[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 6:
+							color = ((num_bitmap_6[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 7:
+							color = ((num_bitmap_7[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 8:
+							color = ((num_bitmap_8[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+						case 9:
+							color = ((num_bitmap_9[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
+							break;
+					}
+					if(color)
+						framePointer[pos] =GREEN;
 					else
-						color = 0;
-					break;
-				case 2:
-					color = ((num_bitmap_2[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 3:
-					color = ((num_bitmap_3[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 4:
-					color = ((num_bitmap_4[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 5:
-					color = ((num_bitmap_5[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 6:
-					color = ((num_bitmap_6[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 7:
-					color = ((num_bitmap_7[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 8:
-					color = ((num_bitmap_8[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
-				case 9:
-					color = ((num_bitmap_9[row] >> (ALPHA_NUM_WIDTH-1-col)) & MASK_ONE);
-					break;
+						framePointer[pos] = framePointerBackground[pos];
+				}
 			}
 		}
+		offset += ALPHA_NUM_WIDTH;
 	}
 }
 
 void paintTankLives()
 {
-	int life, row, col;
+	int life, row, col, pos, color;
 	int lifecount = getLives();
-	for(life = 0; life < lifecount; life++)
+	for(life = 0; life < MAX_LIVES; life++)
 	{
 		for(row = 0; row < TANK_HEIGHT; row++)
 		{
 			for(col = 0; col < TANK_WIDTH; col++)
 			{
-				framePointer[(row + TANK_LIVES_Y)*SCREEN_WIDTH + col + TANK_LIVES_X + (life * (TANK_WIDTH + TANK_LIVES_SPACING))] = (GREEN) * ((tank[row] >> (TANK_WIDTH-1-col)) & MASK_ONE);
+				pos = (row + TANK_LIVES_Y)*SCREEN_WIDTH + col + TANK_LIVES_X + (life * (TANK_WIDTH + TANK_LIVES_SPACING));
+				if(life < lifecount)
+					color = (GREEN) * ((tank[row] >> (TANK_WIDTH-1-col)) & MASK_ONE);
+				else
+					color = 0;
+				if(color)
+					framePointer[pos] = GREEN;
+				else
+					framePointer[pos] = framePointerBackground[pos];
 			}
 		}
 	}
@@ -299,7 +319,6 @@ int  getLastColAlive()
 void alienMarch()
 {
 	int leftendofaliens, rightendofaliens;
-	//xil_printf("first = %d, last= %d\n\r", getFirstColAlive(), getLastColAlive());
 	setMovement(!getMovement());
 	//check outofbounds
 	point_t newloc = getAlienLocation();
@@ -482,6 +501,13 @@ void killAlien(int alienId)
 	if(alienId >= 0 && alienId < NUM_ALIEN_COL * NUM_ALIEN_ROW)
 	{
 		alienAlive[alienId] = 0;
+		removeTankBullet();
+		if(alienId < NUM_ALIEN_COL)
+			setScore(getScore()+TOP_ALIEN_SCORE);
+		else if (alienId < NUM_ALIEN_COL * 3)
+			setScore(getScore()+MIDDLE_ALIEN_SCORE);
+		else
+			setScore(getScore() + BOTTOM_ALIEN_SCORE);
 
 		int alien_row = alienId / NUM_ALIEN_COL;
 		int alien_col = alienId % NUM_ALIEN_COL;
@@ -500,6 +526,7 @@ void killAlien(int alienId)
 
 			}
 		}
+		paintScore();
 	}
 
 
@@ -604,7 +631,6 @@ void fireAlienBullet()
 	point_t temp = alienPosition(aliennum);
 	bulletpos.y = temp.y + ALIEN_HEIGHT;//getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
 	bulletpos.x = temp.x + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;//getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
-	//xil_printf("%d,%d,%d\n\r", aliennum, temp.y, temp.x);
 	for(row = 0; row < MAX_ALIEN_BULLETS; row++)
 	{
 		if(alienBullet[row] <= 0)
@@ -705,13 +731,6 @@ void bulletMove()
 		if(alienhit >= 0)
 		{
 			killAlien(alienhit);
-			removeTankBullet();
-			if(alienhit < NUM_ALIEN_COL)
-				setScore(getScore()+TOP_ALIEN_SCORE);
-			else if (alienhit < NUM_ALIEN_COL * 3)
-				setScore(getScore()+MIDDLE_ALIEN_SCORE);
-			else
-				setScore(getScore() + BOTTOM_ALIEN_SCORE);
 		}
 		else if(bulletpos.y > BUNKER_Y_VALUE && bulletpos.y < BUNKER_Y_VALUE + BUNKER_HEIGHT)
 		{
@@ -837,12 +856,40 @@ void bulletMove()
 				if(tankHitDetection(alienbullethitpoint))
 				{
 					xil_printf("TANKHIT\n\r");
+					currentalienbullets--;
+					alienBullet[alienbullet] = 0;
+					eraseAlienBullet(alienbulletpos);
+					paintTankDead();
+					pauseGame();
+					setLives(getLives()-1);
+					paintTankLives();
+					if(getLives() <= 0)
+					{
+						xil_printf("GAMEOVER FOOL");
+					}
 					//GAMEOVER
 					//exit(0);
 				}
 			}
 		}
 	}
+}
+
+void paintTankDead()
+{
+	int row, col, pos, color;
+		for(row = 0; row < TANK_HEIGHT; row++)
+		{
+			for(col = 0; col < TANK_WIDTH; col++)
+			{
+				pos = ((TANK_Y_VALUE + row) * SCREEN_WIDTH) + (getTankPositionGlobal() + col);
+				color = ((tank_dead[row] >> (TANK_WIDTH-1-col)) & MASK_ONE);
+				if (color)
+					framePointer[pos] = (GREEN);
+				else
+					framePointer[pos] = framePointerBackground[pos];
+			}
+		}
 }
 
 //Draws a bunker in the position indicated by bunkerID ie 1, 2, 3, 4

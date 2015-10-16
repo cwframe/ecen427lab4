@@ -23,7 +23,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define HALF_SECOND 50
 #define BULLET_SPEED 3
 #define BULLET_CHANCE 3
-#define SHIP_MOVE_MAX_TIMER 5
+#define SHIP_MOVE_MAX_TIMER 3
 #define TANK_SPEED 2
 #define ALIEN_MARCH_SPEED QUARTER_SECOND
 
@@ -33,6 +33,7 @@ int gameRunTime = 0;
 int secondTimer = 0;
 int alienMarchTimer = 0;
 int shipMoveTimer = 0;
+int paused = 0;
 
 
 
@@ -83,13 +84,26 @@ void interrupt_handler_dispatcher(void* ptr)
 
 }
 
+void pauseGame()
+{
+	paused = 1;
+}
+
+void resumeGame()
+{
+	paused = 0;
+}
 
 //Timer interrupt for the game.
 void timer_interrupt_handler()
 {
-	secondTimer++;
-	alienMarchTimer++;
-
+	if(!paused)
+	{
+		secondTimer++;
+		alienMarchTimer++;
+		if(getShipAlive())
+			shipMoveTimer++;
+	}
 	//Poll the buttons
     if(secondTimer % TANK_SPEED == 0)
     {
@@ -123,7 +137,7 @@ void timer_interrupt_handler()
 
 	if(getShipAlive())
 	{
-		shipMoveTimer++;
+
 		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
 		{
 			shipMoveTimer = 0;
@@ -131,13 +145,13 @@ void timer_interrupt_handler()
 		}
 	}
 
-	/*if(gameRunTime % (30 + rand()%15))
+	if(gameRunTime % (30 + rand()%15 + 1))
 	{
 		if(!getShipAlive())
 		{
 			setShipAlive(1);
 		}
-	}*/
+	}
 
 
 }
