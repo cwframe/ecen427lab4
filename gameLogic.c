@@ -294,6 +294,29 @@ int tankHitDetection(point_t bulletPosition)
 
 
 
+int motherShipHitDetection(point_t bulletPosition)
+{
+    unsigned int shipPosition = getShipPos();
+    int bitmapX = 0;
+    int bitmapY = 0;
+    int shipHit = 0;
+    
+    bitmapX = bulletPosition.x - shipPosition;
+    bitmapY = bulletPosition.y - SHIP_Y;
+    
+    if(bulletPosition.y >= SHIP_Y && bulletPosition.y < (SHIP_Y + SHIP_HEIGHT))
+    {
+        if(bulletPosition.x >= shipPosition && bulletPosition.x < shipPosition + SHIP_WIDTH)
+        {
+            
+            shipHit = ((saucer[bitmapY] >> (SHIP_WIDTH-1-bitmapX)) & MASK_ONE);
+        }
+    }
+    return shipHit;
+}
+
+
+
 
 //This function is passed a bullet position,
 void bulletHitDetection()

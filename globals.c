@@ -21,7 +21,8 @@ char bunker3Damage;
 int score;
 int lives;
 unsigned int shippos;
-int shipAlive;
+char shipActive;
+char shipAlive;
 
 void globals_init()
 {
@@ -41,13 +42,22 @@ void globals_init()
 	shipAlive = 0;
 }
 
+char getShipActive()
+{
+    return shipActive;
+}
 
-int getShipAlive()
+void setShipActive(char active)
+{
+    shipActive = active;
+}
+
+char getShipAlive()
 {
 	return shipAlive;
 }
 
-void setShipAlive(int alive)
+void setShipAlive(char alive)
 {
 	shipAlive = alive;
 }

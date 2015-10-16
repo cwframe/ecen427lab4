@@ -26,6 +26,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define SHIP_MOVE_MAX_TIMER 3
 #define TANK_SPEED 2
 #define ALIEN_MARCH_SPEED QUARTER_SECOND
+#define FLASH_MAX 3
 
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
@@ -34,39 +35,10 @@ int secondTimer = 0;
 int alienMarchTimer = 0;
 int shipMoveTimer = 0;
 int paused = 0;
+int saucerFlash = 0;
 
 
 
-
-//void input(int c)
-//{
-//	int first,second;
-//	switch (c)
-//	{
-//
-//		case '2':
-//			first = getchar();
-//			second = getchar();
-//			killAlien((first-CHAR_OFFSET) * 10 + (second-CHAR_OFFSET));
-//			break;
-//		case '5':
-//			fireBullet();
-//			//FIRE TEH TANK BULLET
-//			break;
-//		case '3':
-//			fireAlienBullet();
-//			//SHOOT ALL THE BULLETz
-//			break;
-//		case '9':
-//			bulletMove();
-//			break;
-//		case '7':
-//			bunkerHit(getchar()-48, (rand() % BUNKER_WIDTH));
-//			break;
-//		default:
-//			break;
-//	}
-//}
 
 // Main interrupt handler, queries the interrupt controller to see what peripheral
 // fired the interrupt and then dispatches the corresponding interrupt handler.
@@ -135,14 +107,35 @@ void timer_interrupt_handler()
         gameRunTime++;
 	}
 
-	if(getShipAlive())
+	if(getShipActive())
 	{
+        if(getShipAlive)
+        {
+            if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
+            {
+                shipMoveTimer = 0;
+                marchShip();
+            }
+        }
+        else
+        {
+            if(secondTimer % TENTH_SECOND == 0)
+            {
+                //paint 300
+                saucerFlash++;
+            }
+            else
+            {
+                //paint black
+            }
+            if(saucerFlash >= FLASH_MAX)
+            {
+                saucerFlash = 0;
+                setShipActive(0);
+            }
+            
+        }
 
-		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
-		{
-			shipMoveTimer = 0;
-			marchShip();
-		}
 	}
 
 	if(gameRunTime % (30 + rand()%15 + 1))

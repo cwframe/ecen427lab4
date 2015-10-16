@@ -101,8 +101,11 @@ typedef struct {short x; short y;} point_t;
 
 void globals_init();
 
-int getShipAlive();
-void setShipAlive(int alive);
+char getShipAlive();
+void setShipAlive(char alive);
+
+char getShipActive();
+void setShipActive(char active);
 
 int getLives();
 void setLives(int newlives);
