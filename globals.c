@@ -14,10 +14,10 @@ int movement; //1 is out, 0 is in
 int numtankbullet;
 int numalienbullets;
 point_t alienbulletpos[MAX_ALIEN_BULLETS];
-char bunker0Damage;
-char bunker1Damage;
-char bunker2Damage;
-char bunker3Damage;
+int bunker0Damage[] = {0,0,0,0,0,0,0,0,0,0,0,0};
+int bunker1Damage[] = {0,0,0,0,0,0,0,0,0,0,0,0};
+int bunker2Damage[] = {0,0,0,0,0,0,0,0,0,0,0,0};
+int bunker3Damage[] = {0,0,0,0,0,0,0,0,0,0,0,0};
 int score;
 int lives;
 unsigned int shippos;
@@ -33,10 +33,6 @@ void globals_init()
 	tankBullet.y = 0;
 	alienlocation.x = 0;
 	alienlocation.y = ALIEN_START_Y;
-	bunker0Damage = 0;
-	bunker1Damage = 0;
-	bunker2Damage = 0;
-	bunker3Damage = 0;
 	score = 0;
 	lives = MAX_LIVES;
 	shipAlive = 0;
@@ -90,61 +86,7 @@ unsigned int getShipPos()
 	return shippos;
 }
 
-char getBunkerDamage(int bunkerId)
-{
-	switch (bunkerId)
-	{
-		case 0:
-			return bunker0Damage;
-			break;
-		case 1:
-			return bunker1Damage;
-			break;
-		case 2:
-			return bunker2Damage;
-			break;
-		case 3:
-			return bunker3Damage;
-			break;
-		default:
-			return -1;
-			break;
-	}
-}
 
-
-void incrementBunkerDamage(int bunkerId)
-{
-	switch (bunkerId)
-	{
-		case 0:
-			if(bunker0Damage >= MAX_BUNKER_DAMAGE)
-			{
-				bunker0Damage++;
-			}
-			break;
-		case 1:
-			if(bunker1Damage >= MAX_BUNKER_DAMAGE)
-			{
-				bunker1Damage++;
-			}
-			break;
-		case 2:
-			if(bunker2Damage >= MAX_BUNKER_DAMAGE)
-			{
-				bunker2Damage++;
-			}
-			break;
-		case 3:
-			if(bunker3Damage >= MAX_BUNKER_DAMAGE)
-			{
-				bunker3Damage++;
-			}
-			break;
-		default:
-			break;
-	}
-}
 
 point_t* getAlienBulletPos()
 {
@@ -174,6 +116,45 @@ int getNumAlienBullet()
 void setNumAlienBullet(int val)
 {
 	numtankbullet = val;
+}
+
+int getBunkerDamage(point_t bunkerDamageID)
+{
+	switch(bunkerDamageID.x)
+	{
+		case 0:
+			return bunker0Damage[bunkerDamageID.y];
+			break;
+		case 1:
+			return bunker1Damage[bunkerDamageID.y];
+			break;
+		case 2:
+			return bunker2Damage[bunkerDamageID.y];
+			break;
+		case 3:
+			return bunker3Damage[bunkerDamageID.y];
+			break;
+	}
+	return -1;
+}
+
+void incrementBunkerDamage(point_t bunkerDamageID)
+{
+	switch(bunkerDamageID.x)
+	{
+		case 0:
+			bunker0Damage[bunkerDamageID.y]++;
+			break;
+		case 1:
+			bunker1Damage[bunkerDamageID.y]++;
+			break;
+		case 2:
+			bunker2Damage[bunkerDamageID.y]++;
+			break;
+		case 3:
+			bunker3Damage[bunkerDamageID.y]++;
+			break;
+	}
 }
 
 

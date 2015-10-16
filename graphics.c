@@ -735,7 +735,7 @@ void bulletMove()
 		else if(bulletpos.y > BUNKER_Y_VALUE && bulletpos.y < BUNKER_Y_VALUE + BUNKER_HEIGHT)
 		{
 			point_t temp = bunkerHitDetection(bulletpos);
-			if(temp.x >= 0)
+			if(temp.x >= 0 && getBunkerDamage(temp) < MAX_BUNKER_DAMAGE)
 			{
 				bunkerHit(temp.x, temp.y);
 				removeTankBullet();
@@ -934,6 +934,10 @@ void bunkerHit(int bunkerId, int hitLocation)
 	//paintBunker(bunkerId);
 	int row, col;
 	point_t hitspot;
+	point_t temp;
+	temp.x = bunkerId;
+	temp.y = hitLocation;
+	incrementBunkerDamage(temp);
 	hitspot.y = BUNKER_Y_VALUE;
 	switch(bunkerId)
 	{
@@ -973,13 +977,35 @@ void bunkerHit(int bunkerId, int hitLocation)
 	{
 		hitspot.y += BUNKER_DAMAGE_HEIGHT;
 	}
-
+	int damage = getBunkerDamage(temp);
 	for(row = 0; row < BUNKER_DAMAGE_HEIGHT; row++)
 	{
 		for(col = 0; col < BUNKER_DAMAGE_WIDTH; col++)
 		{
 			int pos = (row + hitspot.y) * SCREEN_WIDTH + hitspot.x + col;
-			framePointer[pos] =	(GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+			int color;
+			switch (damage)
+			{
+				case 0:
+					color = 0;
+					break;
+				case 1:
+					color = ((bunkerDamage3[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					break;
+				case 2:
+					color = ((bunkerDamage2[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					break;
+				case 3:
+					color = ((bunkerDamage1[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					break;
+				case 4:
+					color = ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					break;
+			}
+			if(!color)
+				framePointer[pos] =	GREEN;
+			else
+				framePointer[pos] = framePointerBackground[pos];
 
 			//background
 			framePointerBackground[pos] = (GREEN) * ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);

@@ -137,6 +137,11 @@ void updateAlienBulletPos(point_t pos, int index);
 void setScore(int newscore);
 int getScore();
 
+int getBunkerDamage(point_t bunkerDamageID);
+void incrementBunkerDamage(point_t bunkerDamageID);
+
+
+
 //bitmaps of the space invader graphics
 
 static const int alien_top_out[ALIEN_HEIGHT] =
