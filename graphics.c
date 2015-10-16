@@ -979,15 +979,15 @@ void paintBunker(int bunkerId)
 //draws damage at the location of the bunker
 void bunkerHit(int bunkerId, int hitLocation)
 {
-
-	//paintBunker(bunkerId);
 	int row, col;
 	point_t hitspot;
 	point_t temp;
 	temp.x = bunkerId;
 	temp.y = hitLocation;
+	//damages the appropriate location on the correct bunker
 	incrementBunkerDamage(temp);
 	hitspot.y = BUNKER_Y_VALUE;
+	//sets the x position to be where the bunker starts
 	switch(bunkerId)
 	{
 		case 0:
@@ -1003,6 +1003,7 @@ void bunkerHit(int bunkerId, int hitLocation)
 			hitspot.x = BUNKER_3_XPOSITION;
 			break;
 	}
+	//offsets the damage x position to be in the correct spot in the x direction
 	switch(hitLocation % 4)
 	{
 		case 0:
@@ -1018,6 +1019,7 @@ void bunkerHit(int bunkerId, int hitLocation)
 			break;
 
 	}
+	//offsets the y vaue to the correct height so that it draws at the correct position
 	if(hitLocation > 7)
 	{
 		hitspot.y += BUNKER_DAMAGE_HEIGHT *2;
@@ -1026,32 +1028,35 @@ void bunkerHit(int bunkerId, int hitLocation)
 	{
 		hitspot.y += BUNKER_DAMAGE_HEIGHT;
 	}
+	//gets the magnitude of damage at the correct spot
 	int damage = getBunkerDamage(temp);
+	//draws the correct bitmap at the desired location
 	for(row = 0; row < BUNKER_DAMAGE_HEIGHT; row++)
 	{
 		for(col = 0; col < BUNKER_DAMAGE_WIDTH; col++)
 		{
+			//pos is the correct pixel on the screen to be drawn
 			int pos = (row + hitspot.y) * SCREEN_WIDTH + hitspot.x + col;
-			int color;
-			switch (damage)
+			int color;	//1 or 0 depending on the pixel in the bitmap
+			switch (damage)	//assigns color to the correct bit in the bitmap
 			{
 				case 0:
 					color = 0;
 					break;
 				case 1:
-					color = ((bunkerDamage3[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
-					break;
-				case 2:
-					color = ((bunkerDamage2[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
-					break;
-				case 3:
-					color = ((bunkerDamage1[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
-					break;
-				case 4:
 					color = ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 					break;
+				case 2:
+					color = ((bunkerDamage1[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					break;
+				case 3:
+					color = ((bunkerDamage2[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					break;
+				case 4:
+					color = ((bunkerDamage3[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					break;
 			}
-			if(!color)
+			if(color)
 				framePointer[pos] =	GREEN;
 			else
 				framePointer[pos] = framePointerBackground[pos];
@@ -1065,7 +1070,7 @@ void bunkerHit(int bunkerId, int hitLocation)
 
 }
 
-
+//paints the green line at the bottom of the screen
 void paintEarthLine()
 {
 	int row, col;
