@@ -20,9 +20,10 @@ int bunker2Damage[] = {0,0,0,0,0,0,0,0,0,0,0,0};
 int bunker3Damage[] = {0,0,0,0,0,0,0,0,0,0,0,0};
 int score;
 int lives;
-unsigned int shippos;
+int shippos;
 char shipActive;
 char shipAlive;
+int saucerKilled = 0;
 
 void globals_init()
 {
@@ -77,15 +78,25 @@ int getScore()
 	return score;
 }
 
-void setShipPos(unsigned short val)
+void setShipPos(int val)
 {
 	shippos = val;
 }
-unsigned int getShipPos()
+int getShipPos()
 {
 	return shippos;
 }
 
+
+void setMothershipKilled(int val)
+{
+	saucerKilled = val;
+}
+
+int getMothershipKilled()
+{
+	return saucerKilled;
+}
 
 
 point_t* getAlienBulletPos()

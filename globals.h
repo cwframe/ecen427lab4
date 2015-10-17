@@ -118,8 +118,11 @@ unsigned short getTankPositionGlobal();
 void setTankBulletPosition(point_t val);
 point_t getTankBulletPosition();
 
-void setShipPos(unsigned short val);
-unsigned int getShipPos();
+void setShipPos(int val);
+int getShipPos();
+
+void setMothershipKilled(int val);
+int getMothershipKilled();
 
 void setMovement(int movement);
 int getMovement();

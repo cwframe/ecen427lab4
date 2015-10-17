@@ -36,6 +36,16 @@ int currentalienbullets;
 int shipdirection;
 int oldscorearray[4] = {-1,-1,-1,-1};
 
+int getShipDirection()
+{
+	return shipdirection;
+}
+
+void setShipDirection(int direction)
+{
+	shipdirection = direction;
+}
+
 void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
 	//start moving to the right
@@ -75,7 +85,7 @@ void paintShip()
 		{
 			pos = (row + SHIP_Y) * SCREEN_WIDTH + col + getShipPos();
 			color = ((saucer[row] >> (SHIP_WIDTH-1-col)) & MASK_ONE);
-			if(color)
+			if(color && (getShipPos() + col) < SCREEN_WIDTH && (getShipPos() + col) > 0)
 				framePointer[pos] = RED;
 			else
 				framePointer[pos] = framePointerBackground[pos];
@@ -106,7 +116,9 @@ void removeShip()
 			framePointer[pos] = framePointerBackground[pos];
 		}
 	}
-	setShipAlive(0);
+
+	setShipActive(0);
+
 	shipdirection = !shipdirection;
 }
 
@@ -120,7 +132,7 @@ void marchShip()
 	{
 		setShipPos(getShipPos()-SHIP_SPEED);
 	}
-	if(getShipPos() < 0 || getShipPos() + SHIP_WIDTH > SCREEN_WIDTH)
+	if(getShipPos() < -SHIP_WIDTH || getShipPos() > SCREEN_WIDTH)
 	{
 		removeShip();
 	}
@@ -774,6 +786,9 @@ void bulletMove()
 			if(motherShipHitDetection(bulletpos))
 			{
 				setShipAlive(0);
+				setShipActive(0);
+				setMothershipKilled(1);
+				removeShip();
 				removeTankBullet();
 				setScore(getScore() + SHIP_SCORE);
 				paintScore();
@@ -895,7 +910,7 @@ void bulletMove()
 				alienbullethitpoint.x += ALIEN_BULLET_WIDTH/2;
 				if(tankHitDetection(alienbullethitpoint))
 				{
-					xil_printf("TANKHIT\n\r");
+
 					currentalienbullets--;
 					alienBullet[alienbullet] = 0;
 					eraseAlienBullet(alienbulletpos);
@@ -905,7 +920,7 @@ void bulletMove()
 					paintTankLives();
 					if(getLives() <= 0)
 					{
-						xil_printf("GAMEOVER FOOL");
+
 					}
 					//GAMEOVER
 					//exit(0);

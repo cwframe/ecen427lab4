@@ -78,5 +78,9 @@ void marchShip();
 
 void removeShip();
 
+int getShipDirection();
+
+void setShipDirection(int direction);
+
 
 #endif /* GRAPHICS_H_ */

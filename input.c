@@ -31,6 +31,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
 int gameRunTime = 0;
+int saucerTime = 0;
 int secondTimer = 0;
 int alienMarchTimer = 0;
 int shipMoveTimer = 0;
@@ -102,50 +103,68 @@ void timer_interrupt_handler()
     //Tic the clock one second
 	if(secondTimer == SECOND_TIMER_MAX)
 	{
-//		xil_printf("1 Second\n");
+
 		secondTimer = 0;
         gameRunTime++;
+        saucerTime++;
 	}
 
 	if(getShipActive())
 	{
-        if(getShipAlive())
-        {
-            if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
-            {
-                shipMoveTimer = 0;
-                marchShip();
-            }
-        }
-        else
-        {
-            if(secondTimer % TENTH_SECOND == 0)
-            {
-                //paint 300
-            	paintShipScore(1);
-                saucerFlash++;
-            }
-            else
-            {
-                //paint black
-            	paintShipScore(0);
-            }
-            if(saucerFlash >= FLASH_MAX)
-            {
-                saucerFlash = 0;
-                setShipActive(0);
-            }
-            
-        }
+		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
+		{
+			shipMoveTimer = 0;
+			marchShip();
+		}
+	}
+
+	//If the saucer is killed flash the score animation
+	if(getMothershipKilled())
+	{
+		saucerFlash = 1;
+	}
+
+	//If the saucer is killed flash the score animation
+	if(saucerFlash > 0)
+	{
+
+		//Paint score
+		if(secondTimer == HALF_SECOND)
+		{
+			xil_printf("saucer hit \n\r");
+			paintShipScore(1);
+			saucerFlash++;
+		}
+		//paint black
+		else if(secondTimer == SECOND_TIMER_MAX)
+		{
+			paintShipScore(0);
+			saucerFlash++;
+		}
+		if(saucerFlash >= 4)
+		{
+			saucerFlash = 0;
+			if(getShipDirection())
+			{
+				setShipPos(SCREEN_WIDTH + SHIP_WIDTH);
+			}
+			else
+			{
+				setShipPos(-SHIP_WIDTH);
+			}
+		}
 
 	}
 
-	if(gameRunTime % (30 + rand()%15 + 1))
+	//Spawn the saucer every X seconds
+	if(saucerTime == 10)
 	{
+		saucerTime = 0;
 		if(!getShipActive())
 		{
 			setShipActive(1);
 			setShipAlive(1);
+			setMothershipKilled(0);
 		}
 	}
 
