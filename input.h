@@ -14,6 +14,7 @@ void interrupt_handler_dispatcher(void* ptr);
 void timer_interrupt_handler();
 void pauseGame();
 void resumeGame();
+int getPaused();
 
 
 #endif /* INPUT_H_ */

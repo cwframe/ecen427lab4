@@ -67,6 +67,11 @@ void resumeGame()
 	paused = 0;
 }
 
+int getPaused()
+{
+	return paused;
+}
+
 //Timer interrupt for the game.
 void timer_interrupt_handler()
 {
@@ -95,13 +100,13 @@ void timer_interrupt_handler()
     }
     
     //Advance the bullets
-    if(secondTimer % BULLET_SPEED == 0)
+    if(secondTimer % BULLET_SPEED == 0 && !paused)
     {
         bulletMove();
     }
     
     //Tic the clock one second
-	if(secondTimer == SECOND_TIMER_MAX)
+	if(secondTimer == SECOND_TIMER_MAX && !paused)
 	{
 
 		secondTimer = 0;
@@ -109,7 +114,7 @@ void timer_interrupt_handler()
         saucerTime++;
 	}
 
-	if(getShipActive())
+	if(getShipActive() && !paused)
 	{
 		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
 		{
@@ -125,7 +130,7 @@ void timer_interrupt_handler()
 	}
 
 	//If the saucer is killed flash the score animation
-	if(saucerFlash > 0)
+	if(saucerFlash > 0 && !paused)
 	{
 
 		//Paint score
@@ -157,7 +162,7 @@ void timer_interrupt_handler()
 	}
 
 	//Spawn the saucer every X seconds
-	if(saucerTime == 10)
+	if(saucerTime == 10 && !paused)
 	{
 		saucerTime = 0;
 		if(!getShipActive())

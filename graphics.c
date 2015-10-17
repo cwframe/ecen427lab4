@@ -49,6 +49,7 @@ void setShipDirection(int direction)
 void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
 	//start moving to the right
+	pauseGame();
 	movementdirection = 1;
 	shipdirection = 1;
 	framePointer = framePointer0;
@@ -477,7 +478,7 @@ void eraseInBetweenRows()
 
 void paintAliens()
 {
-	int  row, col, pos, i;
+	int  i;
 	for(i = 0; i < NUM_ALIEN_COL*NUM_ALIEN_ROW; i++)
 	{
 		if(alienAlive[i] == 1)
@@ -669,8 +670,8 @@ void fireAlienBullet()
 	point_t bulletpos;
 	int currentbullet;
 	point_t temp = alienPosition(aliennum);
-	bulletpos.y = temp.y + ALIEN_HEIGHT;//getAlienLocation().y + (ALIEN_HEIGHT * NUM_ALIEN_ROW + ROW_SPACING * (NUM_ALIEN_ROW-1));
-	bulletpos.x = temp.x + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;//getAlienLocation().x + (aliennum * ALIEN_WIDTH) - (ALIEN_BULLET_WIDTH/2) + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
+	bulletpos.y = temp.y + ALIEN_HEIGHT;
+	bulletpos.x = temp.x + (ALIEN_WIDTH/2) - ALIEN_BULLET_OFFSET;
 	for(row = 0; row < MAX_ALIEN_BULLETS; row++)
 	{
 		if(alienBullet[row] <= 0)
@@ -895,7 +896,7 @@ void bulletMove()
 				point_t temp = bunkerHitDetection(alienbullethitpoint);
 				short bunkerid = temp.x;
 				short bunkerarea = temp.y;
-				if(bunkerid >= 0 && bunkerid <= 3 && bunkerarea >= 0 && bunkerarea <= 11) //check magic numbers
+				if(bunkerid >= 0 && bunkerid <= 3 && bunkerarea >= 0 && bunkerarea <= 11 && getBunkerDamage(temp) < MAX_BUNKER_DAMAGE) //check magic numbers
 				{
 					currentalienbullets--;
 					alienBullet[alienbullet] = 0;
@@ -920,7 +921,7 @@ void bulletMove()
 					paintTankLives();
 					if(getLives() <= 0)
 					{
-
+						pauseGame();
 					}
 					//GAMEOVER
 					//exit(0);
@@ -1106,106 +1107,6 @@ int getAlienAlive(int alienID)
 {
     return alienAlive[alienID];
 }
-
-
-
-
-//old paint aliens
-/*for(alien_row = 0; alien_row < NUM_ALIEN_ROW; alien_row++)
-	{
-		for (alien_col = 0; alien_col < NUM_ALIEN_COL; alien_col++)
-		{
-			for(row = 0; row < EXPLOSION_HEIGHT; row++)
-			{
-				for(col = 0; col < ALIEN_WIDTH; col++)
-				{
-					if(alienAlive[(alien_row * NUM_ALIEN_COL) + alien_col] && row < ALIEN_HEIGHT)
-					{
-						switch (alien_row)
-						{
-							case 0:
-								pos = (row + getAlienLocation().y)*SCREEN_WIDTH + col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_top_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_top_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							case 1:
-								pos = (row + getAlienLocation().y + ALIEN_HEIGHT + ROW_SPACING) *SCREEN_WIDTH +
-										col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							case 2:
-								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
-											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_middle_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_middle_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							case 3:
-								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH
-											+ col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-
-								break;
-							case 4:
-								pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
-											col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-								if (getMovement())
-								{
-									aliencolor = ((alien_bottom_out[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								else
-								{
-									aliencolor = ((alien_bottom_in[row] >> (ALIEN_WIDTH-1-col)) & MASK_ONE);
-								}
-								break;
-							default:
-								break;
-						}
-						if (aliencolor)
-						{
-								framePointer[pos] = WHITE;
-						}
-						else
-						{
-								framePointer[pos] = framePointerBackground[pos];
-						}
-					}
-					else
-					{
-						pos = (row + getAlienLocation().y + (ALIEN_HEIGHT + ROW_SPACING)*alien_row) *SCREEN_WIDTH +
-								col + (alien_col * ALIEN_WIDTH) + getAlienLocation().x;
-						framePointer[pos] = framePointerBackground[pos];
-					}
-				}
-			}
-		}
-	}*/
-
 
 
 
