@@ -13,6 +13,10 @@
 #include "globals.h"
 #include "xintc_l.h"        // Provides handy macros for the interrupt controller.
 #include "gameLogic.h"
+#include <xtmrctr.h>
+#include <xintc_l.h>
+#include <xgpio.h>
+#include <xparameters.h>
 
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
@@ -49,6 +53,18 @@ int saucerFlash = 0;
 // interrupt must be ack'd by the dispatched interrupt handler.
 void interrupt_handler_dispatcher(void* ptr)
 {
+//	 /* Reset the timers, and clear interrupts */
+//	  XTmrCtr_mSetControlStatusReg(XPAR_DELAY_BASEADDR, 0, XTC_CSR_INT_OCCURED_MASK |
+//	                               XTC_CSR_LOAD_MASK );
+//
+//	  /* Enable timer interrupts in the interrupt controller */
+//	  XIntc_mEnableIntr(XPAR_DELAY_BASEADDR, XPAR_DELAY_INTERRUPT_MASK);
+//
+//	  /* Start the timers */
+//	  XTmrCtr_mSetControlStatusReg(XPAR_DELAY_BASEADDR, 0, XTC_CSR_ENABLE_TMR_MASK |
+//	                               XTC_CSR_ENABLE_INT_MASK | XTC_CSR_AUTO_RELOAD_MASK |
+//	                               XTC_CSR_DOWN_COUNT_MASK);
+
 	int intc_status = XIntc_GetIntrStatus(XPAR_INTC_0_BASEADDR);
     
 	// Check the FIT interrupt first.
@@ -57,6 +73,8 @@ void interrupt_handler_dispatcher(void* ptr)
 		timer_interrupt_handler();
 	}
 
+
+
 }
 
 void pauseGame()
@@ -64,7 +82,7 @@ void pauseGame()
 	xil_printf("paused\n\r");
 	paused = 1;
 }
-
+															//xtmrctr look at examples
 void resumeGame()
 {
 	paused = 0;
@@ -157,12 +175,10 @@ void timer_interrupt_handler()
 
 				setShipPos(-SHIP_WIDTH);
 				setShipDirection(1);
-				xil_printf("to the right\n\r");
 			}
 			else
 			{
 				setShipPos(SCREEN_WIDTH + SHIP_WIDTH);
-				xil_printf("to the left\n\r");
 				setShipDirection(0);
 
 			}

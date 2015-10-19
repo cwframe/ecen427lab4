@@ -103,7 +103,7 @@ void paintShip()
 		for(col = 0; col < SHIP_SPEED; col++)
 		{
 			if(shipdirection)
-				pos = (row + SHIP_Y) * SCREEN_WIDTH - col + getShipPos();
+				pos = (row + SHIP_Y) * SCREEN_WIDTH - (col+1) + getShipPos();
 			else
 				pos = (row + SHIP_Y) * SCREEN_WIDTH + col + getShipPos() + SHIP_WIDTH;
 			framePointer[pos] = framePointerBackground[pos];
@@ -690,8 +690,9 @@ void fireAlienBullet()
 			}
 			aliennum -= NUM_ALIEN_COL;
 		}
+
 		if(aliennum < 0)
-			aliennum = (NUM_ALIEN_ROW-1) * NUM_ALIEN_COL;
+			aliennum += NUM_ALIEN_COL;
 		if(!alienAlive[aliennum])
 		{
 			aliennum++;

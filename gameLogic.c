@@ -84,6 +84,7 @@ int alienHitDetection(point_t position)
             //Account for the alien row spacing
             while(tempPosition > 0)
             {
+            	//xil_printf("alien hit detection\n\r");
                 tempPosition -= ALIEN_HEIGHT + ROW_SPACING;
                 if(tempPosition < 0)
                 {
