@@ -173,6 +173,7 @@ int main()
      while (1) {
     	 //input(getchar());
      }
+     xil_printf("left the while loop\n\r");
      cleanup_platform();
 
     return 0;

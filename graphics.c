@@ -51,6 +51,10 @@ void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 	//start moving to the right
 	xil_printf("paused at start up \n\r");
 	pauseGame();
+	oldscorearray[0] = -1;
+	oldscorearray[1] = -1;
+	oldscorearray[2] = -1;
+	oldscorearray[3] = -1;
 	movementdirection = 1;
 	shipdirection = 1;
 	framePointer = framePointer0;
@@ -372,10 +376,18 @@ void alienMarch()
 		{
 			point_t tempPoint2 = alienPosition(i);
 			tempPoint2.y += ALIEN_HEIGHT;
+			if(tempPoint2.y > ARBRITARY_LINE_OF_DOOM)
+			{
+				pauseGame();
+				setLives(0);
+			}
+			tempPoint2.x += ALIEN_WIDTH/2;
 			point_t tempPoint = bunkerHitDetection(tempPoint2);
 			if(tempPoint.x != -1)
 			{
+				if(getBunkerDamage(tempPoint) < MAX_BUNKER_DAMAGE)
 				bunkerHit(tempPoint.x, tempPoint.y);
+				paintAlien(i);
 			}
 		}
 	}
@@ -549,6 +561,14 @@ void killAlien(int alienId)
 		}
 		paintScore();
 	}
+	int i;
+	for(i = 0; i < TOTAL_NUM_ALIENS; i++)
+	{
+		if(alienAlive[i])
+			return;
+	}
+	pauseGame();
+	setLives(0);
 
 
 }
