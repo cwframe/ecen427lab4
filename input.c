@@ -35,6 +35,8 @@ int saucerTime = 0;
 int secondTimer = 0;
 int alienMarchTimer = 0;
 int shipMoveTimer = 0;
+int bulletMoveTimer = 0;
+int tankMoveTimer = 0;
 int paused = 0;
 int saucerFlash = 0;
 
@@ -59,6 +61,7 @@ void interrupt_handler_dispatcher(void* ptr)
 
 void pauseGame()
 {
+	xil_printf("paused\n\r");
 	paused = 1;
 }
 
@@ -79,11 +82,13 @@ void timer_interrupt_handler()
 	{
 		secondTimer++;
 		alienMarchTimer++;
+		bulletMoveTimer++;
 		if(getShipAlive())
 			shipMoveTimer++;
 	}
+	tankMoveTimer++;
 	//Poll the buttons
-    if(secondTimer % TANK_SPEED == 0)
+    if(tankMoveTimer >= TANK_SPEED)
     {
         handleButton(currentButtonState);
     }
@@ -91,24 +96,25 @@ void timer_interrupt_handler()
     //Advance the aliens and fire bullets
     if(alienMarchTimer >= ALIEN_MARCH_SPEED)
     {
-       //alienMarch();
-        if(rand() % BULLET_CHANCE == 0)
-        {
-            fireAlienBullet();
-        }
-        alienMarchTimer = 0;
+       alienMarch();
+       if(rand() % BULLET_CHANCE == 0)
+       {
+           fireAlienBullet();
+       }
+       alienMarchTimer = 0;
     }
     
     //Advance the bullets
-    if(secondTimer % BULLET_SPEED == 0 && !paused)
+    if(bulletMoveTimer >= BULLET_SPEED)
     {
         bulletMove();
+        bulletMoveTimer = 0;
     }
     
 
 
     //Move the saucer if it is active
-	if(getShipActive() && !paused)
+	if(getShipActive())
 	{
 		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
 		{
@@ -126,7 +132,7 @@ void timer_interrupt_handler()
 	}
 
 	//If the saucer is killed flash the score animation
-	if(saucerFlash > 0 && !paused)
+	if(saucerFlash > 0)
 	{
 
 		//Paint score
@@ -177,7 +183,7 @@ void timer_interrupt_handler()
 	}
 
     //Tic the clock one second
-	if(secondTimer == SECOND_TIMER_MAX && !paused)
+	if(secondTimer >= SECOND_TIMER_MAX)
 	{
 
 		secondTimer = 0;

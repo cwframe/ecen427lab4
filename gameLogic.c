@@ -31,7 +31,7 @@ void handleButton(int currentButtonState)
     
     if(currentButtonState)
     {
-    	if(getLives() > 0)
+    	if(getLives())
     	{
 			paintTank();
 			resumeGame();
@@ -40,15 +40,18 @@ void handleButton(int currentButtonState)
 
     if(currentButtonState & TANK_MOVE_LEFT_MASK)
     {
-        tankMove(0);
+    	if(getLives())
+    		tankMove(0);
     }
     if(currentButtonState & TANK_MOVE_RIGHT_MASK)
     {
-        tankMove(1);
+    	if(getLives())
+    		tankMove(1);
     }
     if(currentButtonState & FIRE_BULLET_MASK)
     {
-        fireBullet();
+    	if(getLives())
+    		fireBullet();
     }
     
 }

@@ -49,6 +49,7 @@ void setShipDirection(int direction)
 void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
 	//start moving to the right
+	xil_printf("paused at start up \n\r");
 	pauseGame();
 	movementdirection = 1;
 	shipdirection = 1;
@@ -462,16 +463,13 @@ void eraseInBetweenRows()
 	for(i = 0; i < NUM_ALIEN_COL * NUM_ALIEN_ROW; i++)
 	{
 		alienId = i;
-		if(alienAlive[alienId])
+		point_t alienpos = alienPosition(alienId);
+		for(row = 1; row <= ALIEN_VERTICAL_DISTANCE; row++)
 		{
-			point_t alienpos = alienPosition(alienId);
-			for(row = 1; row <= ALIEN_VERTICAL_DISTANCE; row++)
+			for(col = 0; col < ALIEN_WIDTH; col++)
 			{
-				for(col = 0; col < ALIEN_WIDTH; col++)
-				{
-					pos = (alienpos.y - row)*SCREEN_WIDTH + col + alienpos.x;
-					framePointer[pos] = framePointerBackground[pos];
-				}
+				pos = (alienpos.y - row)*SCREEN_WIDTH + col + alienpos.x;
+				framePointer[pos] = framePointerBackground[pos];
 			}
 		}
 	}
@@ -544,9 +542,9 @@ void paintShipScore(int flash)
 	offset = 0;
 	for(i = 0; i < 3; i++)
 	{
-		for(row = 0; row < ALPHA_NUM_WIDTH; row++)
+		for(row = 0; row < ALPHA_NUM_HEIGHT; row++)
 		{
-			for(col = 0; col < ALPHA_NUM_HEIGHT; col++)
+			for(col = 0; col < ALPHA_NUM_WIDTH; col++)
 			{
 				pos = (row+SHIP_Y)*SCREEN_WIDTH + col + getShipPos() + offset;
 				switch (i)
@@ -918,13 +916,10 @@ void bulletMove()
 					alienBullet[alienbullet] = 0;
 					eraseAlienBullet(alienbulletpos);
 					paintTankDead();
+					xil_printf("paused because tank was hit\n\r");
 					pauseGame();
 					setLives(getLives()-1);
 					paintTankLives();
-					if(getLives() <= 0)
-					{
-						pauseGame();
-					}
 					//GAMEOVER
 					//exit(0);
 				}
