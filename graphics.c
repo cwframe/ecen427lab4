@@ -133,7 +133,7 @@ void marchShip()
 	{
 		setShipPos(getShipPos()-SHIP_SPEED);
 	}
-	if(getShipPos() < -SHIP_WIDTH || getShipPos() > SCREEN_WIDTH)
+	if(getShipPos() < -SHIP_WIDTH || getShipPos() > SCREEN_WIDTH + SHIP_WIDTH)
 	{
 		removeShip();
 	}
@@ -141,6 +141,8 @@ void marchShip()
 	{
 		paintShip();
 	}
+
+
 }
 
 

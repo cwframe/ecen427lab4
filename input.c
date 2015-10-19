@@ -91,7 +91,7 @@ void timer_interrupt_handler()
     //Advance the aliens and fire bullets
     if(alienMarchTimer >= ALIEN_MARCH_SPEED)
     {
-       alienMarch();
+       //alienMarch();
         if(rand() % BULLET_CHANCE == 0)
         {
             fireAlienBullet();
@@ -105,15 +105,9 @@ void timer_interrupt_handler()
         bulletMove();
     }
     
-    //Tic the clock one second
-	if(secondTimer == SECOND_TIMER_MAX && !paused)
-	{
 
-		secondTimer = 0;
-        gameRunTime++;
-        saucerTime++;
-	}
 
+    //Move the saucer if it is active
 	if(getShipActive() && !paused)
 	{
 		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
@@ -123,8 +117,10 @@ void timer_interrupt_handler()
 		}
 	}
 
+
+
 	//If the saucer is killed flash the score animation
-	if(getMothershipKilled())
+	if(getMothershipKilled() && saucerFlash == 0)
 	{
 		saucerFlash = 1;
 	}
@@ -136,26 +132,33 @@ void timer_interrupt_handler()
 		//Paint score
 		if(secondTimer == HALF_SECOND)
 		{
-			xil_printf("saucer hit \n\r");
 			paintShipScore(1);
 			saucerFlash++;
 		}
 		//paint black
-		else if(secondTimer == SECOND_TIMER_MAX)
+		if(secondTimer == SECOND_TIMER_MAX)
 		{
 			paintShipScore(0);
 			saucerFlash++;
 		}
-		if(saucerFlash >= 4)
+		if(saucerFlash >= 7)
 		{
+			paintShipScore(0);
 			saucerFlash = 0;
+			setMothershipKilled(0);
 			if(getShipDirection())
 			{
-				setShipPos(SCREEN_WIDTH + SHIP_WIDTH);
+
+				setShipPos(-SHIP_WIDTH);
+				setShipDirection(1);
+				xil_printf("to the right\n\r");
 			}
 			else
 			{
-				setShipPos(-SHIP_WIDTH);
+				setShipPos(SCREEN_WIDTH + SHIP_WIDTH);
+				xil_printf("to the left\n\r");
+				setShipDirection(0);
+
 			}
 		}
 
@@ -165,7 +168,7 @@ void timer_interrupt_handler()
 	if(saucerTime == 10 && !paused)
 	{
 		saucerTime = 0;
-		if(!getShipActive())
+		if(!getShipActive() && saucerFlash == 0)
 		{
 			setShipActive(1);
 			setShipAlive(1);
@@ -173,6 +176,14 @@ void timer_interrupt_handler()
 		}
 	}
 
+    //Tic the clock one second
+	if(secondTimer == SECOND_TIMER_MAX && !paused)
+	{
+
+		secondTimer = 0;
+        gameRunTime++;
+        saucerTime++;
+	}
 
 }
 
