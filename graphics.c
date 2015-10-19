@@ -57,10 +57,10 @@ void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 	paintWords();
 	paintTankLives();
 	paintTank();
+	paintBunker(0);
 	paintBunker(1);
 	paintBunker(2);
 	paintBunker(3);
-	paintBunker(4);
 	currentalienbullets = 0;
 	int i;
 	for(i = 0; i < NUM_ALIEN_COL * NUM_ALIEN_ROW; i++)
@@ -948,7 +948,7 @@ void paintTankDead()
 		}
 }
 
-//Draws a bunker in the position indicated by bunkerID ie 1, 2, 3, 4
+//Draws a bunker in the position indicated by bunkerID ie 0, 1, 2, 3
 void paintBunker(int bunkerId)
 {
 	int row, col;
@@ -1051,15 +1051,41 @@ void bunkerHit(int bunkerId, int hitLocation)
 					color = 0;
 					break;
 				case 1:
-					color = ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
-
+					if(hitLocation == 0)
+						color = ((bunkerDamage0_0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 3)
+						color = ((bunkerDamage0_3[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 5)
+						color = ((bunkerDamage0_5[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 6)
+						color = ((bunkerDamage0_6[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else
+						color = ((bunkerDamage0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 					break;
 				case 2:
-					color = ((bunkerDamage1[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					if(hitLocation == 0)
+						color = ((bunkerDamage1_0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 3)
+						color = ((bunkerDamage1_3[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 5)
+						color = ((bunkerDamage1_5[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 6)
+						color = ((bunkerDamage1_6[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else
+						color = ((bunkerDamage1[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 
 					break;
 				case 3:
-					color = ((bunkerDamage2[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					if(hitLocation == 0)
+						color = ((bunkerDamage2_0[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 3)
+						color = ((bunkerDamage2_3[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 5)
+						color = ((bunkerDamage2_5[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else if (hitLocation == 6)
+						color = ((bunkerDamage2_6[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
+					else
+						color = ((bunkerDamage2[row] >> ((BUNKER_DAMAGE_WIDTH)-1-col)) & MASK_ONE);
 
 					break;
 				case 4:
