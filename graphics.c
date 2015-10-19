@@ -362,6 +362,23 @@ void alienMarch()
 	}
 	setAlienLocation(newloc);
 	paintAliens();
+
+
+	//Check for bunker collisions and damage the bunker if they hit the bunker.
+	int i;
+	for(i = 0; i < TOTAL_NUM_ALIENS; i++)
+	{
+		if(getAlienAlive(i))
+		{
+			point_t tempPoint2 = alienPosition(i);
+			tempPoint2.y += ALIEN_HEIGHT;
+			point_t tempPoint = bunkerHitDetection(tempPoint2);
+			if(tempPoint.x != -1)
+			{
+				bunkerHit(tempPoint.x, tempPoint.y);
+			}
+		}
+	}
 }
 
 
