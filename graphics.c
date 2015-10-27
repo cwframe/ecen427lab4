@@ -49,7 +49,7 @@ void setShipDirection(int direction)
 void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
 	//start moving to the right
-	xil_printf("paused at start up \n\r");
+//	xil_printf("paused at start up \n\r");
 	pauseGame();
 	oldscorearray[0] = -1;
 	oldscorearray[1] = -1;
@@ -954,7 +954,7 @@ void bulletMove()
 					alienBullet[alienbullet] = 0;
 					eraseAlienBullet(alienbulletpos);
 					paintTankDead();
-					xil_printf("paused because tank was hit\n\r");
+//					xil_printf("paused because tank was hit\n\r");
 					pauseGame();
 					setLives(getLives()-1);
 					paintTankLives();

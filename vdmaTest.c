@@ -36,7 +36,6 @@
 #define MASK_ONE 0x1
 #define WORD_WIDTH 32
 #define ROW_SPACING 10
-#define DEBUG
 void print(char *str);
 
 

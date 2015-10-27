@@ -79,7 +79,7 @@ void interrupt_handler_dispatcher(void* ptr)
 
 void pauseGame()
 {
-	xil_printf("paused\n\r");
+//	xil_printf("paused\n\r");
 	paused = 1;
 }
 															//xtmrctr look at examples
