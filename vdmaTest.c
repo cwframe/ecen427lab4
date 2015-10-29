@@ -33,6 +33,8 @@
 #include "xgpio.h"          // Provides access to PB GPIO driver.
 #include "mb_interface.h"   // provides the microblaze interrupt enables, etc.
 #include "xintc_l.h"        // Provides handy macros for the interrupt controller.
+#include "xac97_l.h"
+#include "sound.h"
 #define MASK_ONE 0x1
 #define WORD_WIDTH 32
 #define ROW_SPACING 10
@@ -48,7 +50,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 int main()
 {
 	int success;
-
+	xil_printf("um here?\n\r");
 	init_platform();                   // Necessary for all programs.
 	//Set Buttons to be interrupts
 	success = XGpio_Initialize(&gpPB, XPAR_PUSH_BUTTONS_5BITS_DEVICE_ID);
@@ -61,8 +63,9 @@ int main()
 
 	microblaze_register_handler(interrupt_handler_dispatcher, NULL);
 	XIntc_EnableIntr(XPAR_INTC_0_BASEADDR,
-			(XPAR_FIT_TIMER_0_INTERRUPT_MASK | XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK));
+			(XPAR_FIT_TIMER_0_INTERRUPT_MASK | XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK | XPAR_AXI_AC97_0_INTERRUPT_MASK));
 	XIntc_MasterEnable(XPAR_INTC_0_BASEADDR);
+	XAC97_mSetControl(XPAR_AXI_AC97_0_BASEADDR, AC97_ENABLE_IN_FIFO_INTERRUPT);
 	microblaze_enable_interrupts();
 
 
@@ -142,6 +145,7 @@ int main()
      }
      globals_init();
      graphics_init(framePointer0, framePointer1);
+     init_Sound();
 
      //print one alien on frame 0
 

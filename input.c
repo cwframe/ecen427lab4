@@ -17,6 +17,7 @@
 #include <xintc_l.h>
 #include <xgpio.h>
 #include <xparameters.h>
+#include "input.h"
 
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
@@ -68,9 +69,16 @@ void interrupt_handler_dispatcher(void* ptr)
 	int intc_status = XIntc_GetIntrStatus(XPAR_INTC_0_BASEADDR);
     
 	// Check the FIT interrupt first.
-	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK){
+	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK)
+	{
 		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_FIT_TIMER_0_INTERRUPT_MASK);
 		timer_interrupt_handler();
+	}
+
+	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK)
+	{
+		XIntc_AckIntr(XPAR_AXI_AC97_0_BASEADDR, XPAR_AXI_AC97_0_INTERRUPT_MASK);
+		xil_printf("herro\n\r");
 	}
 
 

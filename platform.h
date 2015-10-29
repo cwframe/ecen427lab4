@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Xilinx, Inc.  All rights reserved.
+ * Copyright (c) 2008 Xilinx, Inc.  All rights reserved.
  *
  * Xilinx, Inc.
  * XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS" AS A
@@ -16,32 +16,12 @@
  *
  */
 
-/*
- * helloworld.c: simple test application
- */
+#ifndef __PLATFORM_H_
+#define __PLATFORM_H_
 
-#include <stdio.h>
-#include "platform.h"
-#include "sound.h"
-#include "xparameters.h"
-#include "xac97_l.h"
+#include "platform_config.h"
 
+void init_platform();
+void cleanup_platform();
 
-
-void print(char *str);
-
-int main()
-{
-	init_platform();
-	xil_printf("init\n\r");
-	init_Sound();//hard reset
-	xil_printf("FIRE EVERYTHING\n\r");
-	//for(i = 0; i < 1; i++)
-	/*XAC97_PlayAudio(XPAR_AXI_AC97_0_BASEADDR, Test_getSound(),
-			Test_getSound()+Test_getNumFrames());*/
-	playSound(shoot_getSound(), shoot_getNumFrames());
-	//playTankFireSound();
-	xil_printf("done and cleaning\n\r");
-	cleanup_platform();
-    return 0;
-}
+#endif

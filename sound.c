@@ -6,42 +6,63 @@
  */
 
 #include "sound.h"
+#include "xio.h"
 #include "xac97_l.h"
+#include "xparameters.h"
+#include "platform.h"
+#include "xparameters.h"
+#include "xaxivdma.h"
+#include "sound.h"
 
-#define C_BASEADDR 0xFFFF8000
-#define C_OPB_AWIDTH 32
-#define C_OPB_DWIDTH 32
-#define C_HIGHADDR 0xFFFF80FF
-#define C_PLAYBACK 1
-#define C_RECORD 1
-#define C_INTR_LEVEL 1
-#define C_USE_BRAM 1
-
-extern int tankFireSoundFrames;
-extern int* tankFireSound;
-extern int tankFireSoundRate;
+#define FIFO_SIZE 512
 
 void init_Sound()
 {
 	xil_printf("RESET?\n\r");
-	XAC97_HardReset(C_BASEADDR);
-	//xil_printf("audio?\n\r");
-	//XAC97_InitAudio(C_BASEADDR,2);
-	xil_printf("clearfifo?\n\r");
-	XAC97_ClearFifos(C_BASEADDR);
+	XAC97_HardReset(XPAR_AXI_AC97_0_BASEADDR);
+
+	XAC97_ClearFifos(XPAR_AXI_AC97_0_BASEADDR);
+
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_ExtendedAudioStat, 1);
+
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_PCM_DAC_Rate, AC97_PCM_RATE_11025_HZ);
+
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVol, AC97_VOL_MAX);
+
+
+	XAC97_AwaitCodecReady(XPAR_AXI_AC97_0_BASEADDR);
+
+
+
+
+
+
+
+
 	xil_printf("done\n\r");
 }
 
-void playTankFireSound(int* sound)
+void playSound(unsigned int* sound, int numFrames)
 {
-	int i, j;
-	for(j = 0; j < tankFireSoundFrames/100; j++)
+	int sample = 0;
+	int i;
+	XAC97_AwaitCodecReady(XPAR_AXI_AC97_0_BASEADDR);
+
+	XAC97_ClearFifos(XPAR_AXI_AC97_0_BASEADDR);
+
+	unsigned int* start = sound;
+
+	while( sound < (unsigned int*)(start+numFrames))
 	{
-		for(i = 0; i < 100; i++)
+		sample = *sound;
+		sound = sound + 1;
+		XAC97_WriteFifo(XPAR_AXI_AC97_0_BASEADDR, sample);
+		/*for(i=0; i < 256; i++)
 		{
-			XAC97_WriteFifo(C_BASEADDR + i, tankFireSound[i+(j*100)]);
-		}
-		XAC97_PlayAudio(C_BASEADDR, C_BASEADDR, C_BASEADDR+100);
-		XAC97_ClearFifos(C_BASEADDR);
+//			xil_printf("%d        %d\n\r", sound, i);
+			XAC97_mSetInFifoData(XPAR_AXI_AC97_0_BASEADDR, sample);
+		}*/
 	}
+
+	XAC97_ClearFifos(XPAR_AXI_AC97_0_BASEADDR);
 }

@@ -49,7 +49,7 @@ void setShipDirection(int direction)
 void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 {
 	//start moving to the right
-//	xil_printf("paused at start up \n\r");
+	xil_printf("paused at start up \n\r");
 	pauseGame();
 	oldscorearray[0] = -1;
 	oldscorearray[1] = -1;
