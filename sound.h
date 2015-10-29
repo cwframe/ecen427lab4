@@ -15,7 +15,9 @@ extern alienSound1_sampleRate;*/
 
 void init_Sound();
 
-void playTankFireSound(unsigned int* sound, int numFrames);
+void playSound();
+
+void setSound(unsigned int* soundtoplay, int numFrames, int prioirty);
 
 unsigned int* explosion_getSound();
 int explosion_getSoundRate();
@@ -36,5 +38,11 @@ int ufohighpitch_getNumFrames();
 unsigned int* ufolowpitch_getSound();
 int ufolowpitch_getSoundRate();
 int ufolowpitch_getNumFrames();
+
+unsigned int* march1_getSound();
+int march1_getSoundRate();
+int march1_getNumFrames();
+
+
 
 #endif /* SOUND_H_ */

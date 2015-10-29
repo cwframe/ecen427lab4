@@ -18,6 +18,8 @@
 #include <xgpio.h>
 #include <xparameters.h>
 #include "input.h"
+#include "sound.h"
+#include "xac97_l.h"
 
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
@@ -71,14 +73,20 @@ void interrupt_handler_dispatcher(void* ptr)
 	// Check the FIT interrupt first.
 	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK)
 	{
+//		xil_printf("fit timer\r\n");
+
 		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_FIT_TIMER_0_INTERRUPT_MASK);
 		timer_interrupt_handler();
+
 	}
 
-	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK)
+	if (intc_status & XPAR_AXI_AC97_0_INTERRUPT_MASK)
 	{
+//		if(XAC97_isInFIFOFull(XPAR_AXI_AC97_0_BASEADDR))
+//			xil_printf("buffer is full why are you interrupting????\r\n");
+
 		XIntc_AckIntr(XPAR_AXI_AC97_0_BASEADDR, XPAR_AXI_AC97_0_INTERRUPT_MASK);
-		xil_printf("herro\n\r");
+		audio_interrupt_handler();
 	}
 
 
@@ -142,6 +150,7 @@ void timer_interrupt_handler()
     //Move the saucer if it is active
 	if(getShipActive())
 	{
+		setSound(ufolowpitch_getSound(),ufolowpitch_getNumFrames(), SAUCER_PRIORITY);
 		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
 		{
 			shipMoveTimer = 0;
@@ -215,6 +224,11 @@ void timer_interrupt_handler()
         saucerTime++;
 	}
 
+}
+
+void audio_interrupt_handler()
+{
+	playSound();
 }
 
 

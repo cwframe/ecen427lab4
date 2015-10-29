@@ -51,7 +51,9 @@ void handleButton(int currentButtonState)
     if(currentButtonState & FIRE_BULLET_MASK)
     {
     	if(getLives())
+    	{
     		fireBullet();
+    	}
     }
     
 }

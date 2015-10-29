@@ -15,6 +15,6 @@ void timer_interrupt_handler();
 void pauseGame();
 void resumeGame();
 int getPaused();
-
+void audio_interrupt_handler();
 
 #endif /* INPUT_H_ */

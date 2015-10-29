@@ -31,6 +31,7 @@ unsigned int * framePointer;
 unsigned int * framePointerBackground;
 
 int alienAlive[NUM_ALIEN_COL * NUM_ALIEN_ROW];
+int alienMarchNum = 1;
 int alienBullet[MAX_ALIEN_BULLETS];
 int currentalienbullets;
 int shipdirection;
@@ -339,6 +340,42 @@ void alienMarch()
 {
 	int leftendofaliens, rightendofaliens;
 	setMovement(!getMovement());
+
+	//Play alien sound
+	switch(alienMarchNum)
+	{
+	case 1:
+		setSound(march1_getSound(),march1_getNumFrames(), ALIEN_MARCH_PRIORITY);
+
+		break;
+	case 2:
+		setSound(march2_getSound(),march2_getNumFrames(), ALIEN_MARCH_PRIORITY);
+
+
+		break;
+	case 3:
+		setSound(march3_getSound(),march3_getNumFrames(), ALIEN_MARCH_PRIORITY);
+
+
+		break;
+	case 4:
+		setSound(march4_getSound(),march4_getNumFrames(), ALIEN_MARCH_PRIORITY);
+
+		break;
+	default:
+		break;
+	}
+
+	if(alienMarchNum == 4)
+	{
+		alienMarchNum = 1;
+	}
+	else
+	{
+		alienMarchNum++;
+	}
+
+
 	//check outofbounds
 	point_t newloc = getAlienLocation();
 	leftendofaliens = newloc.x + (getFirstColAlive() * ALIEN_WIDTH);
@@ -559,6 +596,7 @@ void killAlien(int alienId)
 
 			}
 		}
+		setSound(explosion_getSound(), explosion_getNumFrames(), ALIEN_DEATH_PRIORITY);
 		paintScore();
 	}
 	int i;
@@ -664,7 +702,7 @@ void fireBullet()
 		bulletpos.x = (getTankPositionGlobal() + (TANK_WIDTH/2) - TANK_BULLET_WIDTH/2);
 		bulletpos.y = TANK_Y_VALUE - TANK_BULLET_HEIGHT;
 		setTankBulletPosition(bulletpos);
-
+		setSound(shoot_getSound(),shoot_getNumFrames(), TANK_SHOOT_PRIORITY);
 		bulletMove();
 	}
 
@@ -968,6 +1006,7 @@ void bulletMove()
 
 void paintTankDead()
 {
+	setSound(explosion_getSound(),explosion_getNumFrames(), TANK_DEATH_PRIORITY);
 	int row, col, pos, color;
 		for(row = 0; row < TANK_HEIGHT; row++)
 		{
