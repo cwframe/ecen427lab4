@@ -16,6 +16,7 @@
 #include "graphics.h"
 #include "input.h"
 #include "gameLogic.h"
+#include "sound.h"
 
 
 
@@ -342,6 +343,7 @@ void alienMarch()
 	setMovement(!getMovement());
 
 	//Play alien sound
+
 	switch(alienMarchNum)
 	{
 	case 1:
@@ -559,6 +561,7 @@ void paintAliens()
 			eraseTrail(i);
 		}
 	}
+	playSound();
 	eraseFirstTrail();
 	if(movementdirection == 0)
 	{

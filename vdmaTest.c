@@ -66,7 +66,7 @@ int main()
 
 	XIntc_MasterEnable(XPAR_INTC_0_BASEADDR);
 
-	microblaze_enable_interrupts();
+
 
 
 	int Status;                        // Keep track of success/failure of system function calls.
@@ -147,6 +147,7 @@ int main()
      globals_init();
      graphics_init(framePointer0, framePointer1);
      init_Sound();
+     microblaze_enable_interrupts();
      xil_printf("done init\n\r");
      //print one alien on frame 0
 

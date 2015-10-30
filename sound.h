@@ -43,6 +43,7 @@ unsigned int* march1_getSound();
 int march1_getSoundRate();
 int march1_getNumFrames();
 
+int getCurrentPriority();
 
 
 #endif /* SOUND_H_ */

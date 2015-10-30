@@ -17,11 +17,19 @@
 #include "gameLogic.h"
 #include "input.h"
 #include "xgpio.h"
+#include "xac97_l.h"
 
 
 #define TANK_MOVE_LEFT_MASK 8
 #define TANK_MOVE_RIGHT_MASK 2
 #define FIRE_BULLET_MASK 1
+#define UP_MASK	16
+#define DOWN_MASK 4
+#define VOL_INCREMENT 0x100
+#define VOL_TIMER_MAX 10
+
+int volumelevel = 1;
+int volumetimer = 0;
 
 XGpio gpPB;
 //Returns the number of the current button that is being pressed
@@ -56,6 +64,54 @@ void handleButton(int currentButtonState)
     	}
     }
     
+    int temp = volumelevel;
+
+    if(currentButtonState & UP_MASK)
+	{
+    	volumetimer++;
+    	if(volumetimer>= VOL_TIMER_MAX)
+    	{
+			if(volumelevel < 2)
+			{
+				volumelevel++;
+			}
+			volumetimer = 0;
+    	}
+	}
+
+    if(currentButtonState & DOWN_MASK)
+   	{
+    	volumetimer++;
+    	if(volumetimer>= VOL_TIMER_MAX)
+		{
+			if(volumelevel > 0)
+			{
+				volumelevel--;
+			}
+			volumetimer = 0;
+		}
+   	}
+    if(temp != volumelevel)
+    {
+    	switch (volumelevel)
+    	{
+    		case 0:
+    			XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVol, AC97_VOL_MIN);
+				XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_AuxOutVol, AC97_VOL_MIN);
+				XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVolMono, AC97_VOL_MIN);
+    			break;
+    		case 1:
+    			XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVol, AC97_VOL_MID);
+				XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_AuxOutVol, AC97_VOL_MID);
+				XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVolMono, AC97_VOL_MID);
+				break;
+    		case 2:
+    			XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVol, AC97_VOL_MAX);
+				XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_AuxOutVol, AC97_VOL_MAX);
+				XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVolMono, AC97_VOL_MAX);
+    			break;
+    	}
+    }
 }
 
 

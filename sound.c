@@ -32,9 +32,9 @@ void init_Sound()
 
 	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_PCM_DAC_Rate, AC97_PCM_RATE_11025_HZ);
 
-	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVol, AC97_VOL_MAX);
-	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_AuxOutVol, AC97_VOL_MAX);
-	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVolMono, AC97_VOL_MAX);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVol, AC97_VOL_MID);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_AuxOutVol, AC97_VOL_MID);
+	XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_MasterVolMono, AC97_VOL_MID);
 
 	XAC97_mSetControl(XPAR_AXI_AC97_0_BASEADDR, AC97_ENABLE_IN_FIFO_INTERRUPT);
 
@@ -57,7 +57,7 @@ void playSound()
 	//XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_ExtendedAudioStat, 1);
 	//XAC97_WriteReg(XPAR_AXI_AC97_0_BASEADDR, AC97_PCM_DAC_Rate, AC97_PCM_RATE_11025_HZ);
 
-	for(i=0; i < FIFO_SIZE/4; i++)
+	for(i=0; i <FIFO_SIZE/4; i++)
 	{
 //			xil_printf("%d        %d\n\r", sound, i);
 		if(currentIndex >= currentNumFrames)
@@ -71,17 +71,24 @@ void playSound()
 			sample = currentSound[currentIndex];
 			currentIndex++;
 			//XAC97_WriteFifo(XPAR_AXI_AC97_0_BASEADDR, sample);
-			while(XAC97_isInFIFOFull(XPAR_AXI_AC97_0_BASEADDR));
+			//while(XAC97_isInFIFOFull(XPAR_AXI_AC97_0_BASEADDR));
 			XAC97_mSetInFifoData(XPAR_AXI_AC97_0_BASEADDR, ((sample<<16)|sample));
 		}
 	}
 
 }
 
+int getCurrentPriority()
+{
+	return currentPriority;
+}
+
 void setSound(unsigned int* soundtoplay, int numFrames, int priority)
 {
+//	xil_printf("currentPriority = %d\n\r", currentPriority);
 	if(priority > currentPriority)
 	{
+		xil_printf("new sound prority = %d, oldPriority = %d\n\r", priority, currentPriority);
 		currentSound = soundtoplay;
 		currentNumFrames = numFrames;
 		currentIndex = 0;

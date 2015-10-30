@@ -85,7 +85,7 @@ void interrupt_handler_dispatcher(void* ptr)
 //		if(XAC97_isInFIFOFull(XPAR_AXI_AC97_0_BASEADDR))
 //			xil_printf("buffer is full why are you interrupting????\r\n");
 
-		XIntc_AckIntr(XPAR_AXI_AC97_0_BASEADDR, XPAR_AXI_AC97_0_INTERRUPT_MASK);
+		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_AXI_AC97_0_INTERRUPT_MASK);
 		audio_interrupt_handler();
 	}
 
@@ -148,7 +148,7 @@ void timer_interrupt_handler()
 
 
     //Move the saucer if it is active
-	if(getShipActive())
+	if(getShipActive()&&!getPaused())
 	{
 		setSound(ufolowpitch_getSound(),ufolowpitch_getNumFrames(), SAUCER_PRIORITY);
 		if(shipMoveTimer >= SHIP_MOVE_MAX_TIMER)
@@ -173,6 +173,7 @@ void timer_interrupt_handler()
 		//Paint score
 		if(secondTimer == HALF_SECOND)
 		{
+			setSound(ufohighpitch_getSound(),ufohighpitch_getNumFrames(), SAUCER_DEATH_PRIORITY);
 			paintShipScore(1);
 			saucerFlash++;
 		}
