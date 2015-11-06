@@ -20,6 +20,8 @@
 #include "input.h"
 #include "sound.h"
 #include "xac97_l.h"
+#include "math.h"
+#include "PIT.h"
 
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
@@ -46,6 +48,8 @@ int bulletMoveTimer = 0;
 int tankMoveTimer = 0;
 int paused = 0;
 int saucerFlash = 0;
+int counter[10] = {0,0,0,0,0,0,0,0,0,0};
+int numOfInput = 0;
 
 
 
@@ -71,11 +75,12 @@ void interrupt_handler_dispatcher(void* ptr)
 	int intc_status = XIntc_GetIntrStatus(XPAR_INTC_0_BASEADDR);
     
 	// Check the FIT interrupt first.
-	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK)
+	if (intc_status & XPAR_PIT_0_PIT_PORT_MASK) // add pit timer here
+
 	{
 //		xil_printf("fit timer\r\n");
 
-		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_FIT_TIMER_0_INTERRUPT_MASK);
+		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_PIT_0_PIT_PORT_MASK);
 		timer_interrupt_handler();
 
 	}
@@ -232,6 +237,28 @@ void audio_interrupt_handler()
 	playSound();
 }
 
-
+void input(char c)
+{
+	//check to see if its a return
+	int count, i;
+	if(c == 13)
+	{
+		count = 0;
+		for(i = 0; i < numOfInput; i++)
+		{
+			count += counter[i] * pow(10,(numOfInput-1-i));
+		}
+		numOfInput = 0;
+		PIT_set_counter(count);
+	}
+	else if(isdigit(c))
+	{
+		if(!(numOfInput > 9))
+		{
+			counter[numOfInput] = c - '0';
+			numOfInput++;
+		}
+	}
+}
 
 

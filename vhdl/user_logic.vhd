@@ -148,9 +148,7 @@ architecture IMP of user_logic is
   
   alias control_reg is slv_reg0;
   alias delay_reg is slv_reg1;
-  
 
-begin
 
   --USER logic implementation added here
   --PIT
@@ -167,7 +165,7 @@ begin
 		elsif (Bus2IP_Clk 'event and Bus2IP_Clk = '1') then
 			--Reload the timer if 0
 			if slv_reg0(2) = '1' and timer = 0 then
-				timer <= unsigned(slv_reg1);
+				timer <= slv_reg1;
 			elsif slv_reg0(0) = '1' and timer > 0 then
 				--decrement the timer
 				timer <= timer - 1;

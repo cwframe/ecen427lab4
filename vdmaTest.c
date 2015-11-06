@@ -35,6 +35,7 @@
 #include "xintc_l.h"        // Provides handy macros for the interrupt controller.
 #include "xac97_l.h"
 #include "sound.h"
+#include "PIT.h"
 #define MASK_ONE 0x1
 #define WORD_WIDTH 32
 #define ROW_SPACING 10
@@ -62,7 +63,11 @@ int main()
 
 	microblaze_register_handler(interrupt_handler_dispatcher, NULL);
 	XIntc_EnableIntr(XPAR_INTC_0_BASEADDR,
-			(XPAR_FIT_TIMER_0_INTERRUPT_MASK | XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK | XPAR_AXI_AC97_0_INTERRUPT_MASK));
+			(XPAR_PIT_0_PIT_PORT_MASK | XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK | XPAR_AXI_AC97_0_INTERRUPT_MASK));
+
+	PIT_enable_interrupts();
+	PIT_enable_counter();
+	PIT_enable_reload();
 
 	XIntc_MasterEnable(XPAR_INTC_0_BASEADDR);
 
@@ -147,6 +152,7 @@ int main()
      globals_init();
      graphics_init(framePointer0, framePointer1);
      init_Sound();
+     PIT_set_counter(500000);				// sets the frequency of the interrupt
      microblaze_enable_interrupts();
      xil_printf("done init\n\r");
      //print one alien on frame 0
@@ -176,7 +182,7 @@ int main()
      }
      // Oscillate between frame 0 and frame 1.
      while (1) {
-    	 //input(getchar());
+    	 input(getchar());
      }
      xil_printf("left the while loop\n\r");
      cleanup_platform();

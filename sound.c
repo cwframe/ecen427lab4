@@ -88,7 +88,6 @@ void setSound(unsigned int* soundtoplay, int numFrames, int priority)
 //	xil_printf("currentPriority = %d\n\r", currentPriority);
 	if(priority > currentPriority)
 	{
-		xil_printf("new sound prority = %d, oldPriority = %d\n\r", priority, currentPriority);
 		currentSound = soundtoplay;
 		currentNumFrames = numFrames;
 		currentIndex = 0;
