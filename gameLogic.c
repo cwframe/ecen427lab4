@@ -32,6 +32,25 @@ int volumelevel = 1;
 int volumetimer = 0;
 
 XGpio gpPB;
+
+
+void handleController(int currentControllerState)
+{
+	if(currentControllerState & 2)
+	{
+		fireBullet();
+	}
+	if(currentControllerState & 64)
+	{
+		tankMove(0);
+	}
+	if(currentControllerState & 128)
+	{
+		tankMove(1);
+	}
+}
+
+
 //Returns the number of the current button that is being pressed
 void handleButton(int currentButtonState)
 {

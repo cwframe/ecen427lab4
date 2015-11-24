@@ -36,6 +36,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 #define TANK_SPEED 2
 #define ALIEN_MARCH_SPEED QUARTER_SECOND
 #define FLASH_MAX 3
+#define POLL_CONTROLLER_TIMER 1
 
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
@@ -50,6 +51,7 @@ int paused = 0;
 int saucerFlash = 0;
 int counter[10] = {0,0,0,0,0,0,0,0,0,0};
 int numOfInput = 0;
+int controllerTimer = 0;
 
 
 
@@ -75,12 +77,12 @@ void interrupt_handler_dispatcher(void* ptr)
 	int intc_status = XIntc_GetIntrStatus(XPAR_INTC_0_BASEADDR);
     
 	// Check the FIT interrupt first.
-	if (intc_status & XPAR_PIT_0_PIT_PORT_MASK) // add pit timer here
+	if (intc_status & XPAR_FIT_TIMER_0_INTERRUPT_MASK) // add pit timer here
 
 	{
-//		xil_printf("fit timer\r\n");
+		//xil_printf("fit timer\r\n");
 
-		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_PIT_0_PIT_PORT_MASK);
+		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_FIT_TIMER_0_INTERRUPT_MASK);
 		timer_interrupt_handler();
 
 	}
@@ -122,6 +124,7 @@ void timer_interrupt_handler()
 		secondTimer++;
 		alienMarchTimer++;
 		bulletMoveTimer++;
+		controllerTimer++;
 		if(getShipAlive())
 			shipMoveTimer++;
 	}
@@ -130,6 +133,12 @@ void timer_interrupt_handler()
     if(tankMoveTimer >= TANK_SPEED)
     {
         handleButton(currentButtonState);
+    }
+
+    if(controllerTimer >= POLL_CONTROLLER_TIMER)
+    {
+    	controllerTimer = 0;
+    	readController();
     }
 
     //Advance the aliens and fire bullets
@@ -249,7 +258,7 @@ void input(char c)
 			count += counter[i] * pow(10,(numOfInput-1-i));
 		}
 		numOfInput = 0;
-		PIT_set_counter(count);
+		//PIT_set_counter(count);
 	}
 	else if(isdigit(c))
 	{

@@ -22,26 +22,16 @@
 
 #include <stdio.h>
 #include "platform.h"
-#include "sound.h"
-#include "xparameters.h"
-#include "xac97_l.h"
-
-
 
 void print(char *str);
 
 int main()
 {
-	init_platform();
-	xil_printf("init\n\r");
-	init_Sound();//hard reset
-	xil_printf("FIRE EVERYTHING\n\r");
-	//for(i = 0; i < 1; i++)
-	/*XAC97_PlayAudio(XPAR_AXI_AC97_0_BASEADDR, Test_getSound(),
-			Test_getSound()+Test_getNumFrames());*/
-	playSound(shoot_getSound(), shoot_getNumFrames());
-	//playTankFireSound();
-	xil_printf("done and cleaning\n\r");
-	cleanup_platform();
+    init_platform();
+
+    print("Hello World\n\r");
+
+    cleanup_platform();
+
     return 0;
 }
