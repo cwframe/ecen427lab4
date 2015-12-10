@@ -40,6 +40,7 @@ XGpio gpPB;   // This is a handle for the push-button GPIO block.
 
 
 int currentButtonState;		// Value the button interrupt handler saves button values to
+int currentSwitchesState;
 int gameRunTime = 0;
 int saucerTime = 0;
 int secondTimer = 0;
@@ -96,6 +97,11 @@ void interrupt_handler_dispatcher(void* ptr)
 		audio_interrupt_handler();
 	}
 
+	if(intc_status & XPAR_DMA_0_INTERRUPT_MASK)
+	{
+		XIntc_AckIntr(XPAR_INTC_0_BASEADDR, XPAR_DMA_0_INTERRUPT_MASK);
+	}
+
 
 
 }
@@ -133,12 +139,13 @@ void timer_interrupt_handler()
     if(tankMoveTimer >= TANK_SPEED)
     {
         handleButton(currentButtonState);
+        handleSwitches(currentSwitchesState);
     }
 
     if(controllerTimer >= POLL_CONTROLLER_TIMER)
     {
     	controllerTimer = 0;
-    	readController();
+    	//readController();
     }
 
     //Advance the aliens and fire bullets

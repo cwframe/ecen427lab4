@@ -30,7 +30,7 @@
 
 
 
-void graphics_init(unsigned int * framePointer, unsigned int * framePointerbg);
+void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg, unsigned int * framePointer2);
 
 void alienMarch();
 
@@ -82,6 +82,11 @@ void removeShip();
 int getShipDirection();
 
 void setShipDirection(int direction);
+
+void paintScreenCapture();
+void paintAfterScreenCapture();
+
+void softwareScreenCapture();
 
 
 #endif /* GRAPHICS_H_ */

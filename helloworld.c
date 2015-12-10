@@ -1,35 +1,41 @@
-/*
- * Copyright (c) 2009 Xilinx, Inc.  All rights reserved.
- *
- * Xilinx, Inc.
- * XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS" AS A
- * COURTESY TO YOU.  BY PROVIDING THIS DESIGN, CODE, OR INFORMATION AS
- * ONE POSSIBLE   IMPLEMENTATION OF THIS FEATURE, APPLICATION OR
- * STANDARD, XILINX IS MAKING NO REPRESENTATION THAT THIS IMPLEMENTATION
- * IS FREE FROM ANY CLAIMS OF INFRINGEMENT, AND YOU ARE RESPONSIBLE
- * FOR OBTAINING ANY RIGHTS YOU MAY REQUIRE FOR YOUR IMPLEMENTATION.
- * XILINX EXPRESSLY DISCLAIMS ANY WARRANTY WHATSOEVER WITH RESPECT TO
- * THE ADEQUACY OF THE IMPLEMENTATION, INCLUDING BUT NOT LIMITED TO
- * ANY WARRANTIES OR REPRESENTATIONS THAT THIS IMPLEMENTATION IS FREE
- * FROM CLAIMS OF INFRINGEMENT, IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.
- *
- */
-
-/*
- * helloworld.c: simple test application
- */
-
 #include <stdio.h>
 #include "platform.h"
+#include "xparameters.h"
+#include "dma.h"
 
 void print(char *str);
 
 int main()
 {
+
+
+    int source_word[] = {0xDEADBEEF, 0xDEADBEAF, 0xDEEDBEEF, 0xDEEDBEAF};
+    int destination_word[] = {0x0, 0x0, 0x0, 0x0};
+    int transferlength = 4;
+
     init_platform();
 
+
     print("Hello World\n\r");
+    cleanup_platform();
+    printf("Printing value before DMA transfer.\n\r");
+    xil_printf("%x\r\n", destination_word[0]);
+	xil_printf("%x\r\n", destination_word[1]);
+	xil_printf("%x\r\n", destination_word[2]);
+	xil_printf("%x\r\n", destination_word[3]);
+
+    Xil_Out32(XPAR_DMA_0_BASEADDR, (Xuint32)source_word);
+    Xil_Out32(XPAR_DMA_0_BASEADDR+4, (Xuint32)destination_word);
+    Xil_Out32(XPAR_DMA_0_BASEADDR+8, transferlength*4);
+    Xil_Out16(XPAR_DMA_0_BASEADDR+DMA_MST_BE_REG_OFFSET, 0xFFFF);
+
+    Xil_Out8(XPAR_DMA_0_BASEADDR+DMA_MST_GO_PORT_OFFSET, MST_START);
+
+    printf("Printing value after DMA transfer.\n\r");
+    xil_printf("%x\r\n", destination_word[0]);
+    xil_printf("%x\r\n", destination_word[1]);
+    xil_printf("%x\r\n", destination_word[2]);
+    xil_printf("%x\r\n", destination_word[3]);
 
     cleanup_platform();
 

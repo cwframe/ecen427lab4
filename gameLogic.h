@@ -10,6 +10,7 @@
 
 
 void handleButton(int currentButtonState);
+void handleSwitches(int currentSwitchState);
 void handleController(int currentControllerState);
 void bulletHitDetection();
 int  alienHitDetection(point_t position);

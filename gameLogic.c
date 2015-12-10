@@ -18,6 +18,7 @@
 #include "input.h"
 #include "xgpio.h"
 #include "xac97_l.h"
+#include "dma.h"
 
 
 #define TANK_MOVE_LEFT_MASK 8
@@ -27,11 +28,16 @@
 #define DOWN_MASK 4
 #define VOL_INCREMENT 0x100
 #define VOL_TIMER_MAX 10
+#define SW_7 128
+#define SW_6 64
+#define SW_5 32
 
 int volumelevel = 1;
 int volumetimer = 0;
+int prevSwitch;
 
 XGpio gpPB;
+XGpio gpSW;
 
 
 void handleController(int currentControllerState)
@@ -50,6 +56,32 @@ void handleController(int currentControllerState)
 	}
 }
 
+
+void handleSwitches(int currentSwitchState)
+{
+	currentSwitchState = XGpio_DiscreteRead(&gpSW, 1);
+	if(currentSwitchState != prevSwitch)
+	{
+		if(currentSwitchState & SW_7)
+		{
+			DMA_ScreenCapture();
+		}
+		if(currentSwitchState & SW_6)
+		{
+			softwareScreenCapture();
+		}
+		if(currentSwitchState & SW_5)
+		{
+			//print the screencapture
+			paintScreenCapture();
+		}
+		else if(prevSwitch & SW_5)
+		{
+			paintAfterScreenCapture();
+		}
+	}
+	prevSwitch = currentSwitchState;
+}
 
 //Returns the number of the current button that is being pressed
 void handleButton(int currentButtonState)

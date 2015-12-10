@@ -48,23 +48,30 @@ void print(char *str);
 #define MAX_SILLY_TIMER 100000;
 
 XGpio gpPB;   // This is a handle for the push-button GPIO block.
+XGpio gpSW;
+XAxiVdma videoDMAController;
 
 int main()
 {
 	int success;
+	int successSwitches;
 	init_platform();                   // Necessary for all programs.
 	//Set Buttons to be interrupts
 	success = XGpio_Initialize(&gpPB, XPAR_PUSH_BUTTONS_5BITS_DEVICE_ID);
+	successSwitches = XGpio_Initialize(&gpSW, XPAR_SWITCHES_DEVICE_ID);
 	// Set the push button peripheral to be inputs.
 	XGpio_SetDataDirection(&gpPB, 1, 0x0000001F);
+	XGpio_SetDataDirection(&gpSW, 1, 0x0000001F);
 	// Enable the global GPIO interrupt for push buttons.
 	XGpio_InterruptGlobalEnable(&gpPB);
+	XGpio_InterruptGlobalEnable(&gpSW);
 	// Enable all interrupts in the push button peripheral.
 	XGpio_InterruptEnable(&gpPB, 0xFFFFFFFF);
+	XGpio_InterruptEnable(&gpSW, 0xFFFFFFFF);
 
 	microblaze_register_handler(interrupt_handler_dispatcher, NULL);
 	XIntc_EnableIntr(XPAR_INTC_0_BASEADDR,
-			(XPAR_FIT_TIMER_0_INTERRUPT_MASK | XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK | XPAR_AXI_AC97_0_INTERRUPT_MASK));
+			(XPAR_FIT_TIMER_0_INTERRUPT_MASK | XPAR_PUSH_BUTTONS_5BITS_IP2INTC_IRPT_MASK | XPAR_AXI_AC97_0_INTERRUPT_MASK | XPAR_SWITCHES_IP2INTC_IRPT_MASK | XPAR_DMA_0_INTERRUPT_MASK));
 
 	//PIT_enable_interrupts();
 	//PIT_enable_counter();
@@ -76,7 +83,6 @@ int main()
 
 
 	int Status;                        // Keep track of success/failure of system function calls.
-	XAxiVdma videoDMAController;
 	// There are 3 steps to initializing the vdma driver and IP.
 	// Step 1: lookup the memory structure that is used to access the vdma driver.
     XAxiVdma_Config * VideoDMAConfig = XAxiVdma_LookupConfig(XPAR_AXI_VDMA_0_DEVICE_ID);
@@ -123,7 +129,8 @@ int main()
     // is where you will write your video data. The vdma IP/driver then streams it to the HDMI
     // IP.
      myFrameBuffer.FrameStoreStartAddr[0] = FRAME_BUFFER_0_ADDR;
-     myFrameBuffer.FrameStoreStartAddr[1] = FRAME_BUFFER_0_ADDR + 4*640*480;
+     myFrameBuffer.FrameStoreStartAddr[1] = FRAME_BUFFER_0_ADDR + 8*640*480;
+
 
      if(XST_FAILURE == XAxiVdma_DmaSetBufferAddr(&videoDMAController, XAXIVDMA_READ,
     		               myFrameBuffer.FrameStoreStartAddr)) {
@@ -137,6 +144,8 @@ int main()
 
      unsigned int * framePointer0 = (unsigned int *) FRAME_BUFFER_0_ADDR;
      unsigned int * framePointer1 = ((unsigned int *) FRAME_BUFFER_0_ADDR) + 640*480;
+     unsigned int * framePointer2 = ((unsigned int *) FRAME_BUFFER_0_ADDR) + 2*640*480;
+
      // Just paint some large red, green, blue, and white squares in different
      // positions of the image for each frame in the buffer (framePointer0 and framePointer1).
      int row=0, col=0;
@@ -147,11 +156,12 @@ int main()
     			 // upper left corner.
     			 framePointer0[row*640 + col] = 0x00000000;  // black
     			 framePointer1[row*640 + col] = 0x00000000;
+    			 framePointer2[row*640 + col] = 0xFFFFFFFF;
     	 }
      }
      xil_printf("about to init\n\r");
      globals_init();
-     graphics_init(framePointer0, framePointer1);
+     graphics_init(framePointer0, framePointer1, framePointer2);
      init_Sound();
      //PIT_set_counter(500000);				// sets the frequency of the interrupt
 
@@ -179,7 +189,8 @@ int main()
      int frameIndex = 0;
      // We have two frames, let's park on frame 0. Use frameIndex to index them.
      // Note that you have to start the DMA process before parking on a frame.
-     if (XST_FAILURE == XAxiVdma_StartParking(&videoDMAController, frameIndex,  XAXIVDMA_READ)) {
+     if (XST_FAILURE == XAxiVdma_StartParking(&videoDMAController, frameIndex,  XAXIVDMA_READ))
+     {
     	 xil_printf("vdma parking failed\n\r");
      }
      // Oscillate between frame 0 and frame 1.

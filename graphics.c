@@ -18,9 +18,9 @@
 #include "gameLogic.h"
 #include "sound.h"
 
+extern char shipActive;
 
-
-
+extern XAxiVdma videoDMAController;
 void print(char *str);
 
 
@@ -30,6 +30,7 @@ char movementdirection;
 
 unsigned int * framePointer;
 unsigned int * framePointerBackground;
+unsigned int * framePointerScreenCapture;
 
 int alienAlive[NUM_ALIEN_COL * NUM_ALIEN_ROW];
 int alienMarchNum = 1;
@@ -48,7 +49,7 @@ void setShipDirection(int direction)
 	shipdirection = direction;
 }
 
-void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
+void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg, unsigned int * framePointer2)
 {
 	//start moving to the right
 	xil_printf("paused at start up \n\r");
@@ -61,6 +62,7 @@ void graphics_init(unsigned int * framePointer0, unsigned int * framePointerbg)
 	shipdirection = 1;
 	framePointer = framePointer0;
 	framePointerBackground = framePointerbg;
+	framePointerScreenCapture = framePointer2;
 	paintWords();
 	paintTankLives();
 	paintTank();
@@ -1212,10 +1214,34 @@ int getAlienAlive(int alienID)
 }
 
 
+void paintScreenCapture()
+{
+	 if (XST_FAILURE == XAxiVdma_StartParking(&videoDMAController, 1,  XAXIVDMA_READ))
+	 {
+		 xil_printf("vdma parking failed\n\r");
+	 }
+}
+
+void paintAfterScreenCapture()
+{
+	if (XST_FAILURE == XAxiVdma_StartParking(&videoDMAController, 0,  XAXIVDMA_READ))
+		 {
+			 xil_printf("vdma parking failed\n\r");
+		 }
+}
 
 
-
-
+void softwareScreenCapture()
+{
+	int row, col;
+	for(row = 0; row < SCREEN_HEIGHT; row++)
+		{
+			for(col = 0; col < SCREEN_WIDTH; col++)
+			{
+				framePointerScreenCapture[row*SCREEN_WIDTH +col] = framePointer[row*SCREEN_WIDTH+col];
+			}
+		}
+}
 
 
 
